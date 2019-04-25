@@ -6,7 +6,7 @@ const folderStructure = require('./folderStructure');
 // Promisified fs helpers
 const writeFile = promisify(fs.writeFile);
 const readFile = promisify(fs.readFile);
-const readDir = promisify(fs.readDir);
+const readDir = promisify(fs.readdir);
 
 
 // Ensure folder existence
