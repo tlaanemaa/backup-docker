@@ -1,8 +1,13 @@
 const Docker = require('dockerode');
 const limit = require('limit-async')(1);
 const folderStructure = require('./folderStructure');
-const { formatContainerName, saveInspect, loadInspect, volumeFileExists } = require('./utils');
 const inspect2Config = require('./inspect2config');
+const {
+  formatContainerName,
+  saveInspect,
+  loadInspect,
+  volumeFileExists,
+} = require('./utils');
 
 const docker = new Docker();
 
