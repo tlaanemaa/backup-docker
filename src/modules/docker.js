@@ -34,7 +34,7 @@ const backupVolume = (containerName, volumeName, mountPoint) => docker.run(
 // Back up single container by id
 const backupContainer = limit(async (id) => {
   // eslint-disable-next-line no-console
-  console.log(`  💾 Backing up container: ${id}`);
+  console.log(`Backing up container: ${id}`);
   const container = docker.getContainer(id);
   const inspect = await container.inspect();
   const name = formatContainerName(inspect.Name);
@@ -74,7 +74,7 @@ const restoreVolume = (containerName, tarName, mountPoint) => docker.run(
 // Restore (create) container by id
 const restoreContainer = limit(async (name) => {
   // eslint-disable-next-line no-console
-  console.log(`  💾 Restoring container: ${name}`);
+  console.log(`Restoring container: ${name}`);
   const inspect = await loadInspect(name);
   await docker.createContainer(inspect2Config(inspect));
 
