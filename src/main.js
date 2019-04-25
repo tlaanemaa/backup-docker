@@ -12,16 +12,12 @@ const printUsage = () => console.log('Usage: backup-docker <backup|restore> [<co
 // Main backup function
 const backup = async () => {
   const containers = containerNames.length ? containerNames : await getContainers();
-  // eslint-disable-next-line no-console
-  console.log('Backing up the following container inspections:', containers.join(', '));
   return Promise.all(containers.map(backupContainer));
 };
 
 // Main restore function
 const restore = async () => {
   const containers = containerNames.length ? containerNames : await getAllContainerConfigs();
-  // eslint-disable-next-line no-console
-  console.log('Restoring the following containers:', containers.join(', '));
   return Promise.all(containers.map(restoreContainer));
 };
 
