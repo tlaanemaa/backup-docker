@@ -43,12 +43,32 @@ const backupContainer = limit(async (id) => {
   return saveInspect(inspect);
 });
 
+// Restore volume contents from a tar archive
+const restoreVolume = (containerName, tarName, mountPoint) => docker.run(
+  'ubuntu',
+  ['bash', '-c', `"cd ${mountPoint} && tar xvf /backup/${tarName}.tar --strip 1"`],
+  process.stdout,
+  {
+    HostConfig: {
+      AutoRemove: true,
+      Binds: [`${folderStructure.volumes}:/backup`],
+      VolumesFrom: [containerName],
+    },
+  },
+);
+
 // Restore (create) container by id
 const restoreContainer = limit(async (name) => {
   // eslint-disable-next-line no-console
   console.log(`  💾 Restoring container: ${name}`);
   const inspect = await loadInspect(name);
-  return docker.createContainer(inspect2Config(inspect));
+  await docker.createContainer(inspect2Config(inspect));
+
+  return Promise.all(
+    inspect.Mounts
+      .filter(mount => mount.Name)
+      .map(mount => restoreVolume(name, mount.Name, mount.Destination)),
+  );
 });
 
 // Exports
