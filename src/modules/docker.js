@@ -1,7 +1,7 @@
 const Docker = require('dockerode');
 const limit = require('limit-async')(1);
 const folderStructure = require('./folderStructure');
-const { formatContainerName, saveInspect, loadInspect } = require('./utils');
+const { formatContainerName, saveInspect, loadInspect, volumeFileExists } = require('./utils');
 const inspect2Config = require('./inspect2config');
 
 const docker = new Docker();
@@ -66,7 +66,7 @@ const restoreContainer = limit(async (name) => {
 
   return Promise.all(
     inspect.Mounts
-      .filter(mount => mount.Name)
+      .filter(mount => mount.Name && volumeFileExists(mount.Name))
       .map(mount => restoreVolume(name, mount.Name, mount.Destination)),
   );
 });

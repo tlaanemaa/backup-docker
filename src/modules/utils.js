@@ -7,6 +7,7 @@ const folderStructure = require('./folderStructure');
 const writeFile = promisify(fs.writeFile);
 const readFile = promisify(fs.readFile);
 const readDir = promisify(fs.readdir);
+const access = promisify(fs.access);
 
 // Format container names
 const formatContainerName = name => name.replace(/^\//g, '');
@@ -33,10 +34,22 @@ const saveInspect = (inspect) => {
   return writeFile(filePath, inspectString);
 };
 
+// Check if a volume backup exists
+const volumeFileExists = async (name) => {
+  const filePath = path.join(folderStructure.volumes, `${name}.tar`);
+  try {
+    await access(filePath, fs.constants.R_OK);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
 // Exports
 module.exports = {
   formatContainerName,
   getAllInspects,
   loadInspect,
   saveInspect,
+  volumeFileExists,
 };
