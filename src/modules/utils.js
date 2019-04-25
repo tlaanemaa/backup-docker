@@ -9,31 +9,43 @@ const readFile = promisify(fs.readFile);
 const readDir = promisify(fs.readDir);
 
 
-// Helper to ensure folder existence
-module.exports.ensureFolderExistsSync = (dir) => {
+// Ensure folder existence
+const ensureFolderExistsSync = (dir) => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
   }
 };
 
-// Helper to get all container inspects files
-module.exports.getAllInspects = async () => {
+// Format container names
+const formatContainerName = name => name.replace(/^\//g, '');
+
+// Get all container inspects files
+const getAllInspects = async () => {
   const files = await readDir(folderStructure.containers);
   return files
     .filter(file => path.extname(file) === '.json')
     .map(file => path.basename(file, path.extname(file)));
 };
 
-// Helper to write container inspects
-module.exports.saveInspect = (inspect) => {
+// Load container inspects
+const loadInspect = (name) => {
+  const filePath = path.resolve(folderStructure.containers, `${name}.json`);
+  return readFile(filePath);
+};
+
+// Write container inspects
+const saveInspect = (inspect) => {
   const name = inspect.Name.replace(/^\//g, '');
   const filePath = path.resolve(folderStructure.containers, `${name}.json`);
   const inspectString = JSON.stringify(inspect, null, 2);
   return writeFile(filePath, inspectString);
 };
 
-// Helper to load container inspects
-module.exports.loadInspect = (name) => {
-  const filePath = path.resolve(folderStructure.containers, `${name}.json`);
-  return readFile(filePath);
+// Exports
+module.exports = {
+  ensureFolderExistsSync,
+  formatContainerName,
+  getAllInspects,
+  loadInspect,
+  saveInspect,
 };
