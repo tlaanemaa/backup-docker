@@ -28,11 +28,11 @@ const restore = async () => {
       case 'backup':
         await backup();
         break;
-  
+
       case 'restore':
         await restore();
         break;
-  
+
       default:
         // eslint-disable-next-line no-console
         console.error('Invalid operation!');
