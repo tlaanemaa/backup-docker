@@ -8,13 +8,15 @@
       "type": "node",
       "request": "launch",
       "name": "Launch backup",
-      "program": "${workspaceFolder}/src/main.js backup"
+      "program": "${workspaceFolder}/src/main.js",
+      "args": ["backup"]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Launch restore",
-      "program": "${workspaceFolder}/src/main.js restore"
+      "program": "${workspaceFolder}/src/main.js",
+      "args": ["restore"]
     }
   ]
 }
