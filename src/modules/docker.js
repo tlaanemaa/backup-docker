@@ -38,8 +38,11 @@ const backupContainer = limit(async (id) => {
   const container = docker.getContainer(id);
   const inspect = await container.inspect();
   const name = formatContainerName(inspect.Name);
+  const isRunning = inspect.State.Running;
 
-  await container.pause();
+  if (isRunning) {
+    await container.pause();
+  }
 
   await Promise.all(
     inspect.Mounts
@@ -47,7 +50,10 @@ const backupContainer = limit(async (id) => {
       .map(mount => backupVolume(name, mount.Name, mount.Destination)),
   );
 
-  await container.unpause();
+  if (isRunning) {
+    await container.unpause();
+  }
+
   return saveInspect(inspect);
 });
 
