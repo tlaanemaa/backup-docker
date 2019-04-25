@@ -8,14 +8,6 @@ const writeFile = promisify(fs.writeFile);
 const readFile = promisify(fs.readFile);
 const readDir = promisify(fs.readdir);
 
-
-// Ensure folder existence
-const ensureFolderExistsSync = (dir) => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir);
-  }
-};
-
 // Format container names
 const formatContainerName = name => name.replace(/^\//g, '');
 
@@ -43,7 +35,6 @@ const saveInspect = (inspect) => {
 
 // Exports
 module.exports = {
-  ensureFolderExistsSync,
   formatContainerName,
   getAllInspects,
   loadInspect,

@@ -1,7 +1,14 @@
 const path = require('path');
-const { ensureFolderExistsSync } = require('./utils');
+const fs = require('fs');
 
 const cwd = process.cwd();
+
+// Ensure folder existence
+const ensureFolderExistsSync = (dir) => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+  }
+};
 
 const structure = {
   root: path.resolve(cwd, 'docker-backups'),
