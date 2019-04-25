@@ -21,23 +21,25 @@ const restore = async () => {
   return Promise.all(containers.map(restoreContainer));
 };
 
-// Run the operation requested
-try {
-  switch (operation) {
-    case 'backup':
-      backup();
-      break;
-
-    case 'restore':
-      restore();
-      break;
-
-    default:
-      // eslint-disable-next-line no-console
-      console.error('Invalid operation!');
-      printUsage();
+// Run the operation requested in an async wrapper
+(async () => {
+  try {
+    switch (operation) {
+      case 'backup':
+        await backup();
+        break;
+  
+      case 'restore':
+        await restore();
+        break;
+  
+      default:
+        // eslint-disable-next-line no-console
+        console.error('Invalid operation!');
+        printUsage();
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e.message);
   }
-} catch (e) {
-  // eslint-disable-next-line no-console
-  console.error(e.message);
-}
+})();
