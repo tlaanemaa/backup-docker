@@ -39,12 +39,15 @@ const backupContainer = limit(async (id) => {
   const inspect = await container.inspect();
   const name = formatContainerName(inspect.Name);
 
+  await container.pause();
+
   await Promise.all(
     inspect.Mounts
       .filter(mount => mount.Name)
       .map(mount => backupVolume(name, mount.Name, mount.Destination)),
   );
 
+  await container.unpause();
   return saveInspect(inspect);
 });
 
