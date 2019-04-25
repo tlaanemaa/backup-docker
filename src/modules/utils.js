@@ -21,9 +21,10 @@ const getAllInspects = async () => {
 };
 
 // Load container inspects
-const loadInspect = (name) => {
+const loadInspect = async (name) => {
   const filePath = path.resolve(folderStructure.containers, `${name}.json`);
-  return readFile(filePath);
+  const inspect = await readFile(filePath);
+  return JSON.parse(inspect);
 };
 
 // Write container inspects
