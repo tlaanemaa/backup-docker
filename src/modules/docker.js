@@ -16,13 +16,9 @@ const dockerBackupMountDir = '/__volume_backup_mount__';
 // Create docker instance using the provided socket path if available
 const docker = socketPath ? new Docker({ socketPath }) : new Docker();
 
-/*
-  We want to back up and restore the containers and volumes sequentially
-  to avoid triggering too many operations at once.
-  To achieve that we create limits
-*/
+// Construct async limits to avoid doing too many concurrent operations
 const containerLimit = createLimiter(1);
-const volumeLimit = createLimiter(1);
+const volumeLimit = createLimiter(4);
 
 // Get all containers
 const getContainers = async (all = true) => {
