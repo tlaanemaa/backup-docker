@@ -1,5 +1,5 @@
 const Docker = require('dockerode');
-const limit = require('limit-async')(1);
+const createLimiter = require('limit-async');
 const folderStructure = require('./folderStructure');
 const inspect2Config = require('./inspect2config');
 const {
@@ -9,8 +9,18 @@ const {
   volumeFileExists,
 } = require('./utils');
 
-const docker = new Docker();
+// Volume backup directory mount path inside the container.
 const dockerBackupMountDir = '/__volume_backup_mount__';
+
+const docker = new Docker();
+
+/*
+  We want to back up and restore the containers and volumes sequentially
+  to avoid triggering too many operations at once.
+  To achieve that we create limits
+*/
+const containerLimit = createLimiter(1);
+const volumeLimit = createLimiter(1);
 
 // Get all containers
 const getContainers = async (all = true) => {
@@ -19,7 +29,7 @@ const getContainers = async (all = true) => {
 };
 
 // Backup volume as a tar file
-const backupVolume = (containerName, volumeName, mountPoint) => docker.run(
+const backupVolume = volumeLimit((containerName, volumeName, mountPoint) => docker.run(
   'ubuntu',
   ['tar', 'cvf', `${dockerBackupMountDir}/${volumeName}.tar`, mountPoint],
   process.stdout,
@@ -30,10 +40,10 @@ const backupVolume = (containerName, volumeName, mountPoint) => docker.run(
       VolumesFrom: [containerName],
     },
   },
-);
+));
 
 // Back up single container by id
-const backupContainer = limit(async (id) => {
+const backupContainer = containerLimit(async (id) => {
   // eslint-disable-next-line no-console
   console.log(`Backing up container: ${id}`);
   const container = docker.getContainer(id);
@@ -63,7 +73,7 @@ const backupContainer = limit(async (id) => {
 });
 
 // Restore volume contents from a tar archive
-const restoreVolume = (containerName, tarName, mountPoint) => docker.run(
+const restoreVolume = volumeLimit((containerName, tarName, mountPoint) => docker.run(
   'ubuntu',
   ['tar', 'xvf', `${dockerBackupMountDir}/${tarName}.tar`, '--strip', '1', '--directory', mountPoint],
   process.stdout,
@@ -74,10 +84,10 @@ const restoreVolume = (containerName, tarName, mountPoint) => docker.run(
       VolumesFrom: [containerName],
     },
   },
-);
+));
 
 // Restore (create) container by id
-const restoreContainer = limit(async (name) => {
+const restoreContainer = containerLimit(async (name) => {
   // eslint-disable-next-line no-console
   console.log(`Restoring container: ${name}`);
   const inspect = await loadInspect(name);
