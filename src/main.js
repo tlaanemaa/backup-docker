@@ -1,5 +1,5 @@
 require('./modules/folderStructure');
-const { operation, containerNames } = require('./modules/options');
+const { operation, containers: containerNames } = require('./modules/options');
 const { getContainers, restoreContainer, backupContainer } = require('./modules/docker');
 const { getAllContainerConfigs } = require('./modules/utils');
 
