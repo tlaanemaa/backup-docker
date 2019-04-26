@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const args = require('./arguments');
+const { directory } = require('./options');
 
 // Ensure folder existence
 const ensureFolderExistsSync = (dir) => {
@@ -10,8 +10,8 @@ const ensureFolderExistsSync = (dir) => {
 };
 
 const structure = {
-  containers: path.resolve(args.directory, 'containers'),
-  volumes: path.resolve(args.directory, 'volumes'),
+  containers: path.resolve(directory, 'containers'),
+  volumes: path.resolve(directory, 'volumes'),
 };
 
 ensureFolderExistsSync(structure.containers);

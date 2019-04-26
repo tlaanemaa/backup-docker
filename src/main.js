@@ -1,14 +1,7 @@
 require('./modules/folderStructure');
-const args = require('./modules/arguments');
+const { operation, containerNames } = require('./modules/options');
 const { getContainers, restoreContainer, backupContainer } = require('./modules/docker');
 const { getAllContainerConfigs } = require('./modules/utils');
-
-// Grab unnamed args
-const [operation, ...containerNames] = args._;
-
-// Helper to print command line args
-// eslint-disable-next-line no-console
-const printUsage = () => console.log('Usage: backup-docker <backup|restore> [<container-name, container-name, ...>]');
 
 // Main backup function
 const backup = async () => {
@@ -52,8 +45,6 @@ const restore = async () => {
       break;
 
     default:
-      // eslint-disable-next-line no-console
-      console.error('Invalid operation!');
-      printUsage();
+      // Do nothing
   }
 })();
