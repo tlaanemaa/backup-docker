@@ -23,4 +23,6 @@ Docker.prototype.getContainer = () => ({
   unpause: () => null,
 });
 
+Docker.prototype.run = jest.fn().mockImplementation(() => Promise.resolve());
+
 module.exports = Docker;

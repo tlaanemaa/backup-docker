@@ -8,6 +8,7 @@ const docker = require('../../src/modules/docker');
 
 beforeEach(() => {
   fs.writeFile.mockClear();
+  dockerode.prototype.run.mockClear();
 });
 
 describe('getContainers', () => {
@@ -25,6 +26,23 @@ describe('backupContainer', () => {
       '/folder/containers/banana.json',
       JSON.stringify(dockerode.mockInspection, null, 2),
       expect.any(Function),
+    );
+  });
+
+  it('should should write inspect file', async () => {
+    await docker.backupContainer(3);
+    expect(dockerode.prototype.run).toHaveBeenCalledTimes(2);
+    expect(dockerode.prototype.run).toHaveBeenLastCalledWith(
+      'ubuntu',
+      ['tar', 'cvf', '/__volume_backup_mount__/mount2.tar', 'dest2'],
+      expect.any(Object),
+      {
+        HostConfig: {
+          AutoRemove: true,
+          Binds: ['/folder/volumes:/__volume_backup_mount__'],
+          VolumesFrom: ['banana'],
+        },
+      },
     );
   });
 });
