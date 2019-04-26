@@ -1,18 +1,14 @@
+/* eslint-disable global-require */
 jest.mock('fs');
 jest.mock('dockerode');
 jest.mock('../../src/modules/options.js');
 
-const fs = require('fs');
-const dockerode = require('dockerode');
-const docker = require('../../src/modules/docker');
-
-beforeEach(() => {
-  fs.writeFile.mockClear();
-  dockerode.prototype.run.mockClear();
-});
+beforeEach(() => jest.resetModules());
 
 describe('getContainers', () => {
   it('should return an array of container ids', async () => {
+    const docker = require('../../src/modules/docker');
+
     const containers = await docker.getContainers();
     expect(containers).toEqual([1, 2, 3]);
   });
@@ -20,6 +16,10 @@ describe('getContainers', () => {
 
 describe('backupContainer', () => {
   it('should should write inspect file', async () => {
+    const fs = require('fs');
+    const dockerode = require('dockerode');
+    const docker = require('../../src/modules/docker');
+
     await docker.backupContainer(3);
     expect(fs.writeFile).toHaveBeenCalledTimes(1);
     expect(fs.writeFile).toHaveBeenCalledWith(
@@ -29,7 +29,10 @@ describe('backupContainer', () => {
     );
   });
 
-  it('should should write inspect file', async () => {
+  it('should should tar volumes', async () => {
+    const dockerode = require('dockerode');
+    const docker = require('../../src/modules/docker');
+
     await docker.backupContainer(3);
     expect(dockerode.prototype.run).toHaveBeenCalledTimes(2);
     expect(dockerode.prototype.run).toHaveBeenLastCalledWith(
@@ -44,5 +47,29 @@ describe('backupContainer', () => {
         },
       },
     );
+  });
+
+  it('should only write inspect when only is containers', async () => {
+    const fs = require('fs');
+    const dockerode = require('dockerode');
+    const options = require('../../src/modules/options');
+    options.only = 'containers';
+    const docker = require('../../src/modules/docker');
+
+    await docker.backupContainer(3);
+    expect(dockerode.prototype.run).toHaveBeenCalledTimes(0);
+    expect(fs.writeFile).toHaveBeenCalledTimes(1);
+  });
+
+  it('should only write volumes when only is volumes', async () => {
+    const fs = require('fs');
+    const dockerode = require('dockerode');
+    const options = require('../../src/modules/options');
+    options.only = 'volumes';
+    const docker = require('../../src/modules/docker');
+
+    await docker.backupContainer(3);
+    expect(dockerode.prototype.run).toHaveBeenCalledTimes(2);
+    expect(fs.writeFile).toHaveBeenCalledTimes(0);
   });
 });
