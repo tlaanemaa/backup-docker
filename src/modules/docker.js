@@ -1,6 +1,6 @@
 const Docker = require('dockerode');
 const createLimiter = require('limit-async');
-const { socketPath } = require('./options');
+const { socketPath, only } = require('./options');
 const folderStructure = require('./folderStructure');
 const inspect2Config = require('./inspect2config');
 const {
@@ -59,11 +59,13 @@ const backupContainer = containerLimit(async (id) => {
   }
 
   // Backup volumes
-  await Promise.all(
-    inspect.Mounts
-      .filter(mount => mount.Name)
-      .map(mount => backupVolume(name, mount.Name, mount.Destination)),
-  );
+  if (!only || only === 'volumes') {
+    await Promise.all(
+      inspect.Mounts
+        .filter(mount => mount.Name)
+        .map(mount => backupVolume(name, mount.Name, mount.Destination)),
+    );
+  }
 
   // Unpause container if it was running
   if (isRunning) {
@@ -71,7 +73,11 @@ const backupContainer = containerLimit(async (id) => {
   }
 
   // Backup container
-  return saveInspect(inspect);
+  if (!only || only === 'containers') {
+    return saveInspect(inspect);
+  }
+
+  return null;
 });
 
 // Restore volume contents from a tar archive
@@ -95,24 +101,29 @@ const restoreContainer = containerLimit(async (name) => {
   const inspect = await loadInspect(name);
 
   // Restore container
-  const container = await docker.createContainer(inspect2Config(inspect));
+  let container = null;
+  if (!only || only === 'containers') {
+    container = await docker.createContainer(inspect2Config(inspect));
+  }
 
   // Restore volumes
-  await Promise.all(
-    inspect.Mounts
-      .filter(mount => mount.Name)
-      .map(async (mount) => {
-        const fileExists = await volumeFileExists(mount.Name);
-        return (
-          fileExists
-            ? restoreVolume(name, mount.Name, mount.Destination)
-            : null
-        );
-      }),
-  );
+  if (!only || only === 'volumes') {
+    await Promise.all(
+      inspect.Mounts
+        .filter(mount => mount.Name)
+        .map(async (mount) => {
+          const fileExists = await volumeFileExists(mount.Name);
+          return (
+            fileExists
+              ? restoreVolume(name, mount.Name, mount.Destination)
+              : null
+          );
+        }),
+    );
+  }
 
   // Start the container if it was backed up in a running state
-  if (inspect.State.Running) {
+  if (container && inspect.State.Running) {
     await container.start();
   }
 
