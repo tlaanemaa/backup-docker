@@ -33,8 +33,8 @@ const restore = async () => {
   }));
 };
 
-// Run the operation requested in an async wrapper
-(async () => {
+// Main method to run the tool
+const main = async () => {
   switch (operation) {
     case 'backup':
       await backup();
@@ -47,4 +47,11 @@ const restore = async () => {
     default:
       // Do nothing
   }
-})();
+};
+
+// Decide if we should run or export the method, based on if we're in testing env or not
+if (process.env.NODE_ENV !== 'test') {
+  main();
+} else {
+  module.exports = main;
+}
