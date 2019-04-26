@@ -1,9 +1,8 @@
-const path = require('path');
 const parseArgs = require('minimist');
 
 // Parse args
 const args = parseArgs(process.argv.slice(2), {
-  boolean: ['containerOnly', 'volumesOnly'],
+  boolean: ['containersOnly', 'volumesOnly', 'help'],
   default: {
     directory: process.cwd(),
     socketPath: null,

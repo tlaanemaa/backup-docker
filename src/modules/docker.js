@@ -1,5 +1,6 @@
 const Docker = require('dockerode');
 const createLimiter = require('limit-async');
+const args = require('./arguments');
 const folderStructure = require('./folderStructure');
 const inspect2Config = require('./inspect2config');
 const {
@@ -12,7 +13,8 @@ const {
 // Volume backup directory mount path inside the container.
 const dockerBackupMountDir = '/__volume_backup_mount__';
 
-const docker = new Docker();
+// Create docker instance using the provided socket path if available
+const docker = args.socketPath ? new Docker({ socketPath: args.socketPath }) : new Docker();
 
 /*
   We want to back up and restore the containers and volumes sequentially
