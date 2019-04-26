@@ -40,20 +40,24 @@ const backupContainer = limit(async (id) => {
   const name = formatContainerName(inspect.Name);
   const isRunning = inspect.State.Running;
 
+  // Pause container if it's running so it wouldn't change files while we copy them
   if (isRunning) {
     await container.pause();
   }
 
+  // Backup volumes
   await Promise.all(
     inspect.Mounts
       .filter(mount => mount.Name)
       .map(mount => backupVolume(name, mount.Name, mount.Destination)),
   );
 
+  // Unpause container if it was running
   if (isRunning) {
     await container.unpause();
   }
 
+  // Backup container
   return saveInspect(inspect);
 });
 
@@ -76,12 +80,22 @@ const restoreContainer = limit(async (name) => {
   // eslint-disable-next-line no-console
   console.log(`Restoring container: ${name}`);
   const inspect = await loadInspect(name);
+
+  // Restore container
   await docker.createContainer(inspect2Config(inspect));
 
+  // Restore volumes
   return Promise.all(
     inspect.Mounts
-      .filter(mount => mount.Name && volumeFileExists(mount.Name))
-      .map(mount => restoreVolume(name, mount.Name, mount.Destination)),
+      .filter(mount => mount.Name)
+      .map(async (mount) => {
+        const fileExists = await volumeFileExists(mount.Name);
+        return (
+          fileExists
+            ? restoreVolume(name, mount.Name, mount.Destination)
+            : null
+        );
+      }),
   );
 });
 
