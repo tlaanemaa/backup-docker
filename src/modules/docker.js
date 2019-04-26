@@ -10,6 +10,7 @@ const {
 } = require('./utils');
 
 const docker = new Docker();
+const dockerBackupMountDir = '/__volume_backup_mount__';
 
 // Get all containers
 const getContainers = async (all = true) => {
@@ -20,12 +21,12 @@ const getContainers = async (all = true) => {
 // Backup volume as a tar file
 const backupVolume = (containerName, volumeName, mountPoint) => docker.run(
   'ubuntu',
-  ['tar', 'cvf', `/backup/${volumeName}.tar`, mountPoint],
+  ['tar', 'cvf', `${dockerBackupMountDir}/${volumeName}.tar`, mountPoint],
   process.stdout,
   {
     HostConfig: {
       AutoRemove: true,
-      Binds: [`${folderStructure.volumes}:/backup`],
+      Binds: [`${folderStructure.volumes}:${dockerBackupMountDir}`],
       VolumesFrom: [containerName],
     },
   },
@@ -64,12 +65,12 @@ const backupContainer = limit(async (id) => {
 // Restore volume contents from a tar archive
 const restoreVolume = (containerName, tarName, mountPoint) => docker.run(
   'ubuntu',
-  ['tar', 'xvf', `/backup/${tarName}.tar`, '--strip', '1', '--directory', mountPoint],
+  ['tar', 'xvf', `${dockerBackupMountDir}/${tarName}.tar`, '--strip', '1', '--directory', mountPoint],
   process.stdout,
   {
     HostConfig: {
       AutoRemove: true,
-      Binds: [`${folderStructure.volumes}:/backup`],
+      Binds: [`${folderStructure.volumes}:${dockerBackupMountDir}`],
       VolumesFrom: [containerName],
     },
   },
