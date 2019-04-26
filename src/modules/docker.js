@@ -60,7 +60,7 @@ const backupContainer = limit(async (id) => {
 // Restore volume contents from a tar archive
 const restoreVolume = (containerName, tarName, mountPoint) => docker.run(
   'ubuntu',
-  ['bash', '-c', `"cd ${mountPoint} && tar xvf /backup/${tarName}.tar --strip 1"`],
+  ['tar', 'xvf', `/backup/${tarName}.tar`, '--strip', '1', '--directory', mountPoint],
   process.stdout,
   {
     HostConfig: {
