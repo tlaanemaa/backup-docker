@@ -62,3 +62,6 @@ typings/
 
 # docker backups
 docker-backups/
+
+# Mac .DS_Store files
+.DS_Store
