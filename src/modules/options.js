@@ -75,7 +75,7 @@ const parseArgs = () => {
     args = commandLineArgs(optionDefinitions);
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.error(e.message);
+    console.error(e.message, '\nUse the --help option to see docs');
     process.exit(1);
   }
 
