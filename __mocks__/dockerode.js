@@ -6,4 +6,21 @@ Docker.prototype.listContainers = () => Promise.resolve([
   { Id: 3 },
 ]);
 
+Docker.mockInspection = {
+  Name: 'banana',
+  State: {
+    Running: true,
+  },
+  Mounts: [
+    { Name: 'mount1', Destination: 'dest1' },
+    { Name: 'mount2', Destination: 'dest2' },
+  ],
+};
+
+Docker.prototype.getContainer = () => ({
+  inspect: () => Promise.resolve(Docker.mockInspection),
+  pause: () => null,
+  unpause: () => null,
+});
+
 module.exports = Docker;
