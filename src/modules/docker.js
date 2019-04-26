@@ -101,7 +101,6 @@ const restoreContainer = limit(async (name) => {
 
 // Exports
 module.exports = {
-  docker,
   getContainers,
   backupContainer,
   restoreContainer,
