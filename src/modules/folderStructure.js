@@ -1,7 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-
-const cwd = process.cwd();
+const args = require('./arguments');
 
 // Ensure folder existence
 const ensureFolderExistsSync = (dir) => {
@@ -11,12 +10,10 @@ const ensureFolderExistsSync = (dir) => {
 };
 
 const structure = {
-  root: path.resolve(cwd, 'docker-backups'),
-  containers: path.resolve(cwd, 'docker-backups', 'containers'),
-  volumes: path.resolve(cwd, 'docker-backups', 'volumes'),
+  containers: path.resolve(args.directory, 'containers'),
+  volumes: path.resolve(args.directory, 'volumes'),
 };
 
-ensureFolderExistsSync(structure.root);
 ensureFolderExistsSync(structure.containers);
 ensureFolderExistsSync(structure.volumes);
 

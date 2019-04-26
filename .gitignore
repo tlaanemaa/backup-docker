@@ -60,8 +60,9 @@ typings/
 # next.js build output
 .next
 
-# docker backups
-docker-backups/
+# docker backup folders
+containers/
+volumes/
 
 # Mac .DS_Store files
 .DS_Store

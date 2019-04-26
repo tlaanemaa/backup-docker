@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "dockerode": "^2.5.8",
-    "limit-async": "^1.3.0"
+    "limit-async": "^1.3.0",
+    "minimist": "^1.2.0"
   }
 }
