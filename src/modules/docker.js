@@ -83,10 +83,10 @@ const restoreContainer = limit(async (name) => {
   const inspect = await loadInspect(name);
 
   // Restore container
-  await docker.createContainer(inspect2Config(inspect));
+  const container = await docker.createContainer(inspect2Config(inspect));
 
   // Restore volumes
-  return Promise.all(
+  await Promise.all(
     inspect.Mounts
       .filter(mount => mount.Name)
       .map(async (mount) => {
@@ -98,6 +98,13 @@ const restoreContainer = limit(async (name) => {
         );
       }),
   );
+
+  // Start the container if it was backed up in a running state
+  if (inspect.State.Running) {
+    await container.start();
+  }
+
+  return container;
 });
 
 // Exports
