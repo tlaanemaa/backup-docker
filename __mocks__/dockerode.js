@@ -17,12 +17,16 @@ Docker.mockInspection = {
   ],
 };
 
-Docker.prototype.getContainer = () => ({
+const container = {
   inspect: () => Promise.resolve(Docker.mockInspection),
-  pause: () => null,
-  unpause: () => null,
-});
+  pause: () => Promise.resolve(),
+  unpause: () => Promise.resolve(),
+  start: () => Promise.resolve(),
+};
 
-Docker.prototype.run = jest.fn().mockImplementation(() => Promise.resolve());
+Docker.prototype.getContainer = () => container;
+
+Docker.prototype.run = jest.fn().mockResolvedValue();
+Docker.prototype.createContainer = jest.fn().mockResolvedValue(container);
 
 module.exports = Docker;
