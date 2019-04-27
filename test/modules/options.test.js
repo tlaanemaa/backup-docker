@@ -30,4 +30,20 @@ describe('options', () => {
     );
     expect(global.process.exit).toHaveBeenCalledWith(1);
   });
+
+  it('should show error if no operation name is provided', () => {
+    const commandLineArgs = require('command-line-args');
+    commandLineArgs.args = [];
+    global.console.error = jest.fn();
+    global.process.exit = jest.fn();
+
+    require('../../src/modules/options');
+
+    expect(global.console.error).toHaveBeenCalledTimes(1);
+    expect(global.console.error).toHaveBeenCalledWith(
+      'Operation name must be provided!',
+      '\nUse the --help option to see docs',
+    );
+    expect(global.process.exit).toHaveBeenCalledWith(1);
+  });
 });
