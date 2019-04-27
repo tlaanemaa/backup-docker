@@ -31,17 +31,9 @@ _When run with `restore` operation, backup-docker will expect these folders to e
 - `backup-docker restore -c banana --only=volumes` - Will restore the volumes attached to the container named "banana" but not the container itself. The volumes will be taken from the backed up inspection file of the container
 
 ## All options
-```
---operation enum            Operation to perform, can be passed without the name as
-                            the first argument. Options: backup | restore
--c, --containers string[]   Optional names of the containers to backup or restore.
-                            Defaults to all containers
--d, --directory string      Optional directory name to save to or look for container
-                            backups. Defaults to current working directory
--s, --socketPath string     Optional Docker socket path. Defaults to
-                            /var/run/docker.sock
--o, --only enum             Optional to indicate that only containers or volumes
-                            should be backed up or restored. Defaults to both.
-                            Options: containers | volumes
--h, --help                  Prints this help page
-```
+- `--operation enum` - Operation to perform, can be passed without the name as the first argument. Options: backup | restore
+- `-c, --containers string[]` - Optional names of the containers to backup or restore. Defaults to all containers
+- `-d, --directory string` - Optional directory name to save to or look for container backups. Defaults to current working directory
+- `-s, --socketPath string` - Optional Docker socket path. Defaults to `/var/run/docker.sock`
+- `-o, --only enum` - Optional to indicate that only containers or volumes should be backed up or restored. Defaults to both. Options: containers | volumes
+- `-h, --help` - Prints this help page
