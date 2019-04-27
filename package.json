@@ -16,6 +16,7 @@
   "keywords": [
     "docker",
     "backup",
+    "restore",
     "inspect",
     "volume"
   ],
