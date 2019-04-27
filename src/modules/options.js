@@ -73,7 +73,10 @@ const parseArgs = () => {
   let args;
   try {
     args = commandLineArgs(optionDefinitions);
-    if (!args.operation) throw new Error('Operation name must be provided!');
+
+    if (!args.operation) {
+      throw new Error('Operation name must be provided!');
+    }
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e.message, '\nUse the --help option to see docs');
