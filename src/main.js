@@ -40,8 +40,8 @@ const main = () => {
 };
 
 // Decide if we should run or export the method, based on if we're in testing env or not
-if (process.env.NODE_ENV !== 'test') {
-  main();
-} else {
+if (process.env.NODE_ENV === 'test') {
   module.exports = main;
+} else {
+  main();
 }
