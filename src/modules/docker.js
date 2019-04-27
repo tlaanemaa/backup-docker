@@ -20,6 +20,10 @@ const docker = socketPath ? new Docker({ socketPath }) : new Docker();
 const containerLimit = createLimiter(1);
 const volumeLimit = createLimiter(4);
 
+// Decide what we will operate on
+const operateOnContainers = !only || only === 'containers';
+const operateOnVolumes = !only || only === 'volumes';
+
 // Get all containers
 const getContainers = async (all = true) => {
   const containers = await docker.listContainers({ all });
@@ -55,7 +59,7 @@ const backupContainer = containerLimit(async (id) => {
   }
 
   // Backup volumes
-  if (!only || only === 'volumes') {
+  if (operateOnVolumes) {
     await Promise.all(
       inspect.Mounts
         .filter(mount => mount.Name)
@@ -69,7 +73,7 @@ const backupContainer = containerLimit(async (id) => {
   }
 
   // Backup container
-  if (!only || only === 'containers') {
+  if (operateOnContainers) {
     return saveInspect(inspect);
   }
 
@@ -98,7 +102,7 @@ const restoreContainer = containerLimit(async (name) => {
 
   // Restore container
   let container = null;
-  if (!only || only === 'containers') {
+  if (operateOnContainers) {
     container = await docker.createContainer(inspect2Config(inspect));
   } else {
     container = docker.getContainer(name);
@@ -114,7 +118,7 @@ const restoreContainer = containerLimit(async (name) => {
   }
 
   // Restore volumes
-  if (!only || only === 'volumes') {
+  if (operateOnVolumes) {
     await Promise.all(
       newInspect.Mounts
         .filter(mount => mount.Name)
@@ -135,10 +139,7 @@ const restoreContainer = containerLimit(async (name) => {
   }
 
   // Start the container if it was backed up in a running state and is not currently running
-  if (
-    (!only || only === 'containers')
-    && inspect.State.Running
-  ) {
+  if (operateOnContainers && inspect.State.Running) {
     await container.start();
   }
 
