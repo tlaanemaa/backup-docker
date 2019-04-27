@@ -42,7 +42,7 @@ const optionDefinitions = [
     name: 'only',
     alias: 'o',
     type: enumOf(['containers', 'volumes']),
-    description: 'Optional to indicate that only containers or volumes should be backed up or restored. If only is set to "volumes" for a "restore" operation then volume names will be taken from the container inspect file in containers folder, the container is expected to already exist and it will not be paused. Defaults to both. Options: containers | volumes',
+    description: 'Optional to indicate that only containers or volumes should be backed up or restored. If only is set to "volumes" for a "restore" operation then the container is expected to already exist. Defaults to both. Options: containers | volumes',
   },
   {
     name: 'help',

@@ -24,16 +24,16 @@ _When run with `restore` operation, backup-docker will expect these folders to e
 
 ## Examples
 - `backup-docker backup` - Will backup all containers in the docker instance, and their volumes
-- `backup-docker restore` - Will restore all containers in containers folder, and their volumes.
+- `backup-docker restore` - Will restore all containers in containers folder, and their volumes
 - `backup-docker backup -c banana` - Will backup only the container named "banana" and all of it's volumes
 - `backup-docker restore -c banana` - Will restore only the container named "banana" and all of it's volumes
 - `backup-docker restore -c banana --only=containers` - Will restore only the container named "banana" and not it's volumes
-- `backup-docker restore -c banana --only=volumes` - Will restore the volumes attached to the container named "banana" but not the container itself. The volumes will be taken from the backed up inspection file of the container. The container itself must already exist in the docker instance. Also, this does not pause the container.
+- `backup-docker restore -c banana --only=volumes` - Will restore the volumes attached to the container named "banana" but not the container itself. The container itself must already exist in the docker instance
 
 ## All options
 - `--operation enum` - Operation to perform, can be passed without the name as the first argument. Options: backup | restore
 - `-c, --containers string[]` - Optional names of the containers to backup or restore. Defaults to all containers
 - `-d, --directory string` - Optional directory name to save to or look for container backups. Defaults to current working directory
 - `-s, --socketPath string` - Optional Docker socket path. Defaults to `/var/run/docker.sock`
-- `-o, --only enum` - Optional to indicate that only containers or volumes should be backed up or restored. If only is set to "volumes" for a "restore" operation then volume names will be taken from the container inspect file in containers folder, the container is expected to already exist and it will not be paused. Defaults to both. Options: containers | volumes
+- `-o, --only enum` - Optional to indicate that only containers or volumes should be backed up or restored. If only is set to "volumes" for a "restore" operation then the container is expected to already exist. Defaults to both. Options: containers | volumes
 - `-h, --help` - Prints this help page
