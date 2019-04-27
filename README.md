@@ -16,11 +16,11 @@ There are 2 main operations:
 - `backup` - Creates a backup of the given container, or all if none is specified, and it's volumes
 - `restore` - Restores containers and volumes from existing backup files. 
 
-When ran, two directories are created if not already present in the target directory (defaults to current working directory):
+When run, two directories are created if not already present in the target directory (defaults to current working directory):
 - `containers` - Used to store container inspection files as .json files
 - `volumes` - Used to store the contents of volumes as .tar files
 
-_When ran with `restore` operation, backup-docker will expect these folders to exist in the target directory, if they don't, it will create them_
+_When run with `restore` operation, backup-docker will expect these folders to exist in the target directory, if they don't, it will create them_
 
 ## Examples
 - `backup-docker backup` - Will backup all containers in the docker instance, and their volumes
