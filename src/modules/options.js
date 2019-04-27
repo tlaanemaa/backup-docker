@@ -56,7 +56,7 @@ const optionDefinitions = [
 const usage = commandLineUsage([
   {
     header: 'Backup Docker',
-    content: 'A simple command line tool to backup and restore docker container inspection results and their volumes',
+    content: 'A simple command line tool to backup and restore docker container inspection results and their volumes.\nRead more at: https://www.npmjs.com/package/backup-docker',
   },
   {
     header: 'Synopsis',
