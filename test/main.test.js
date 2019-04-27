@@ -13,7 +13,9 @@ describe('backup', () => {
     const docker = require('../src/modules/docker');
     const main = require('../src/main');
 
-    await main();
+    const result = await main();
+
+    expect(result).toEqual([true, true, true]);
     expect(docker.getContainers).toHaveBeenCalledTimes(1);
     expect(docker.backupContainer).toHaveBeenCalledTimes(3);
     expect(docker.backupContainer).toHaveBeenLastCalledWith(8);
@@ -26,9 +28,21 @@ describe('backup', () => {
     const main = require('../src/main');
 
     await main();
+
     expect(docker.getContainers).toHaveBeenCalledTimes(0);
     expect(docker.backupContainer).toHaveBeenCalledTimes(1);
     expect(docker.backupContainer).toHaveBeenLastCalledWith('pear');
+  });
+
+  it('should catch errors and return false', async () => {
+    const options = require('../src/modules/options');
+    options.containers = ['pear'];
+    const docker = require('../src/modules/docker');
+    docker.backupContainer = () => { throw new Error('Mock backup error'); };
+    const main = require('../src/main');
+
+    const result = await main();
+    expect(result).toEqual([false]);
   });
 });
 
@@ -41,7 +55,9 @@ describe('restore', () => {
     const docker = require('../src/modules/docker');
     const main = require('../src/main');
 
-    await main();
+    const result = await main();
+
+    expect(result).toEqual([true, true, true]);
     expect(fs.readdir).toHaveBeenCalledTimes(1);
     expect(fs.readdir).toHaveBeenCalledWith('/folder/containers', expect.any(Function));
     expect(docker.restoreContainer).toHaveBeenCalledTimes(3);
@@ -57,8 +73,21 @@ describe('restore', () => {
     const main = require('../src/main');
 
     await main();
+
     expect(fs.readdir).toHaveBeenCalledTimes(0);
     expect(docker.restoreContainer).toHaveBeenCalledTimes(1);
     expect(docker.restoreContainer).toHaveBeenLastCalledWith('mango');
+  });
+
+  it('should catch errors and return false', async () => {
+    const options = require('../src/modules/options');
+    options.operation = 'restore';
+    options.containers = ['pear'];
+    const docker = require('../src/modules/docker');
+    docker.restoreContainer = () => { throw new Error('Mock restore error'); };
+    const main = require('../src/main');
+
+    const result = await main();
+    expect(result).toEqual([false]);
   });
 });
