@@ -100,12 +100,23 @@ const restoreContainer = containerLimit(async (name) => {
   let container = null;
   if (!only || only === 'containers') {
     container = await docker.createContainer(inspect2Config(inspect));
+  } else {
+    container = docker.getContainer(name);
+  }
+
+  // Get restored (or existing if only === 'volumes) container's inspect
+  const newInspect = await container.inspect();
+  const isRunning = inspect.State.Running;
+
+  // Pause container if it's running so it wouldn't change files while we copy them
+  if (isRunning) {
+    await container.pause();
   }
 
   // Restore volumes
   if (!only || only === 'volumes') {
     await Promise.all(
-      inspect.Mounts
+      newInspect.Mounts
         .filter(mount => mount.Name)
         .map(async (mount) => {
           const fileExists = await volumeFileExists(mount.Name);
@@ -118,8 +129,16 @@ const restoreContainer = containerLimit(async (name) => {
     );
   }
 
-  // Start the container if it was backed up in a running state
-  if (container && inspect.State.Running) {
+  // Unpause container if it was running
+  if (isRunning) {
+    await container.unpause();
+  }
+
+  // Start the container if it was backed up in a running state and is not currently running
+  if (
+    (!only || only === 'containers')
+    && inspect.State.Running
+  ) {
     await container.start();
   }
 
