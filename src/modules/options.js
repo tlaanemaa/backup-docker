@@ -15,7 +15,7 @@ const optionDefinitions = [
     name: 'operation',
     type: enumOf(['backup', 'restore']),
     defaultOption: true,
-    description: 'Operation to perform, either backup or restore',
+    description: 'Operation to perform. Options: backup | restore',
   },
   {
     name: 'containers',
@@ -42,7 +42,7 @@ const optionDefinitions = [
     name: 'only',
     alias: 'o',
     type: enumOf(['containers', 'volumes']),
-    description: 'Optional to indicate that operation should only happen with containers or volumes. Defaults to both',
+    description: 'Optional to indicate that only containers or volumes should be backed up or restored. Defaults to both. Options: containers | volumes',
   },
   {
     name: 'help',

@@ -17,7 +17,7 @@ When ran, two directories are created if not already present in the target direc
 - `containers` - Used to store container inspection files as .json files
 - `volumes` - Used to store the contents of volumes as .tar files
 
-When ran with `restore` operation, backup-docker will expect these folders to exist in the target directory, if they don't, it will create them.
+_When ran with `restore` operation, backup-docker will expect these folders to exist in the target directory, if they don't, it will create them_
 
 ## Examples
 - `backup-docker backup` - Will backup all containers and their volumes
@@ -27,13 +27,13 @@ When ran with `restore` operation, backup-docker will expect these folders to ex
 
 ## All options
 ```
---operation enum            Operation to perform, either backup or restore                                
+--operation enum            Operation to perform. Options: backup | restore                               
 -c, --containers string[]   Optional names of the containers to backup or restore. Defaults to all        
                             containers                                                                    
 -d, --directory string      Optional directory name to save to or look for container backups. Defaults to 
                             current working directory                                                     
 -s, --socketPath string     Optional Docker socket path. Defaults to /var/run/docker.sock                 
--o, --only enum             Optional to indicate that operation should only happen with containers or     
-                            volumes. Defaults to both                                                     
--h, --help                  Prints this help page 
+-o, --only enum             Optional to indicate that only containers or volumes should be backed up or   
+                            restored. Defaults to both. Options: containers | volumes                     
+-h, --help                  Prints this help page  
 ```
