@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node .",
     "test": "npm run lint && jest . --coverage",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "coveralls": "jest --coverage && cat ./coverage/lcov.info | coveralls"
   },
   "repository": {
     "type": "git",
@@ -23,6 +24,7 @@
   },
   "homepage": "https://github.com/tlaanemaa/backup-docker#readme",
   "devDependencies": {
+    "coveralls": "^3.0.3",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.17.2",
