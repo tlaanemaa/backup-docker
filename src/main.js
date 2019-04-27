@@ -1,7 +1,7 @@
 require('./modules/folderStructure');
 const { operation, containers: containerNames } = require('./modules/options');
 const { getContainers, restoreContainer, backupContainer } = require('./modules/docker');
-const { getAllContainerConfigs } = require('./modules/utils');
+const { getAllInspects } = require('./modules/utils');
 
 // Main backup function
 const backup = async () => {
@@ -20,7 +20,7 @@ const backup = async () => {
 
 // Main restore function
 const restore = async () => {
-  const containers = containerNames.length ? containerNames : await getAllContainerConfigs();
+  const containers = containerNames.length ? containerNames : await getAllInspects();
   return Promise.all(containers.map(async (container) => {
     try {
       await restoreContainer(container);
