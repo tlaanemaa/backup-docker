@@ -28,7 +28,7 @@ _When run with `restore` operation, backup-docker will expect these folders to e
 - `backup-docker backup -c banana` - Will backup only the container named "banana" and all of it's volumes
 - `backup-docker restore -c banana` - Will restore only the container named "banana" and all of it's volumes
 - `backup-docker restore -c banana --only=containers` - Will restore only the container named "banana" and not it's volumes
-- `backup-docker restore -c banana --only=volumes` - Will restore the volumes attached to the container named "banana" but not the container itself. The volumes will be taken from the backed up inspection file of the container
+- `backup-docker restore -c banana --only=volumes` - Will restore the volumes attached to the container named "banana" but not the container itself. The volumes will be taken from the backed up inspection file of the container. The container itself must already exist in the docker instance
 
 ## All options
 - `--operation enum` - Operation to perform, can be passed without the name as the first argument. Options: backup | restore
