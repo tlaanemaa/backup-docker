@@ -22,8 +22,8 @@ When ran, two directories are created if not already present in the target direc
 _When ran with `restore` operation, backup-docker will expect these folders to exist in the target directory, if they don't, it will create them_
 
 ## Examples
-- `backup-docker backup` - Will backup all containers and their volumes
-- `backup-docker restore` - Will restore all containers (in containers folder) and their volumes.
+- `backup-docker backup` - Will backup all containers in the docker instance, and their volumes
+- `backup-docker restore` - Will restore all containers in containers folder, and their volumes.
 - `backup-docker backup -c banana` - Will backup only the container named "banana" and all of it's volumes
 - `backup-docker restore -c banana` - Will restore only the container named "banana" and all of it's volumes
 - `backup-docker restore -c banana --only=containers` - Will restore only the container named "banana" and not it's volumes
