@@ -99,18 +99,18 @@ const restoreVolume = volumeLimit((containerName, tarName, mountPoint) => docker
 const restoreContainer = containerLimit(async (name) => {
   // eslint-disable-next-line no-console
   console.log(`Restoring container: ${name}`);
-  const inspect = await loadInspect(name);
+  const backupInspect = await loadInspect(name);
 
   // Restore container
   let container = null;
   if (operateOnContainers) {
-    container = await docker.createContainer(inspect2Config(inspect));
+    container = await docker.createContainer(inspect2Config(backupInspect));
   } else {
     container = docker.getContainer(name);
   }
 
   // Get restored (or existing if only === 'volumes) container's inspect
-  const newInspect = await container.inspect();
+  const inspect = await container.inspect();
   const isRunning = inspect.State.Running;
 
   // Restore volumes
@@ -122,7 +122,7 @@ const restoreContainer = containerLimit(async (name) => {
 
     // Go over the container's volumes, check if they have a backup file and restore if they do
     await Promise.all(
-      newInspect.Mounts
+      inspect.Mounts
         .filter(mount => mount.Name)
         .map(async (mount) => {
           const fileExists = await volumeFileExists(mount.Name);
@@ -141,7 +141,11 @@ const restoreContainer = containerLimit(async (name) => {
   }
 
   // Start the container if it was backed up in a running state and is not currently running
-  if (operateOnContainers && inspect.State.Running) {
+  if (
+    operateOnContainers
+    && backupInspect.State.Running
+    && !inspect.State.Running
+  ) {
     await container.start();
   }
 
