@@ -21,8 +21,8 @@ describe('options', () => {
     global.console.error = jest.fn();
     global.process.exit = jest.fn();
 
-    require('../../src/modules/options');
-
+    expect(() => require('../../src/modules/options'))
+      .toThrow('Invalid value: banana. Available options are: ["backup","restore"]');
     expect(global.console.error).toHaveBeenCalledTimes(1);
     expect(global.console.error).toHaveBeenCalledWith(
       'Invalid value: banana. Available options are: ["backup","restore"]',
@@ -37,8 +37,8 @@ describe('options', () => {
     global.console.error = jest.fn();
     global.process.exit = jest.fn();
 
-    require('../../src/modules/options');
-
+    expect(() => require('../../src/modules/options'))
+      .toThrow('Operation name must be provided!');
     expect(global.console.error).toHaveBeenCalledTimes(1);
     expect(global.console.error).toHaveBeenCalledWith(
       'Operation name must be provided!',
