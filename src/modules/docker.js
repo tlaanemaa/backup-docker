@@ -53,23 +53,24 @@ const backupContainer = containerLimit(async (id) => {
   const name = formatContainerName(inspect.Name);
   const isRunning = inspect.State.Running;
 
-  // Pause container if it's running so it wouldn't change files while we copy them
-  if (isRunning) {
-    await container.pause();
-  }
-
   // Backup volumes
   if (operateOnVolumes) {
+    // Pause container if it's running so it wouldn't change files while we copy them
+    if (isRunning) {
+      await container.pause();
+    }
+
+    // Go over the container's volumes back them up
     await Promise.all(
       inspect.Mounts
         .filter(mount => mount.Name)
         .map(mount => backupVolume(name, mount.Name, mount.Destination)),
     );
-  }
 
-  // Unpause container if it was running
-  if (isRunning) {
-    await container.unpause();
+    // Unpause container if it was running
+    if (isRunning) {
+      await container.unpause();
+    }
   }
 
   // Backup container
@@ -112,13 +113,14 @@ const restoreContainer = containerLimit(async (name) => {
   const newInspect = await container.inspect();
   const isRunning = inspect.State.Running;
 
-  // Pause container if it's running so it wouldn't change files while we copy them
-  if (isRunning) {
-    await container.pause();
-  }
-
   // Restore volumes
   if (operateOnVolumes) {
+    // Pause container if it's running so it wouldn't change files while we copy them
+    if (isRunning) {
+      await container.pause();
+    }
+
+    // Go over the container's volumes, check if they have a backup file and restore if they do
     await Promise.all(
       newInspect.Mounts
         .filter(mount => mount.Name)
@@ -131,11 +133,11 @@ const restoreContainer = containerLimit(async (name) => {
           );
         }),
     );
-  }
 
-  // Unpause container if it was running
-  if (isRunning) {
-    await container.unpause();
+    // Unpause container if it was running
+    if (isRunning) {
+      await container.unpause();
+    }
   }
 
   // Start the container if it was backed up in a running state and is not currently running
