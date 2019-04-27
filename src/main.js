@@ -34,7 +34,7 @@ const restore = async () => {
 };
 
 // Main method to run the tool
-const main = async () => {
+const main = () => {
   const operations = { backup, restore };
   return operations[operation]();
 };
