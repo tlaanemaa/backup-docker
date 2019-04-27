@@ -4,7 +4,9 @@ A simple command line tool to backup and restore docker container inspection res
 The main idea of this package is to make backing up and restoring docker container as easy as possible while avoiding backing up information that we can easily reproduce. This is achieved by backing up only the container's inspection files and the contents of their volumes. The inspection files can then be later used to recreate the same container, with the same settings, and the volume backups can be used to restore the contents of that container's volumes.
 
 ## Installation
-`npm install -g backup-docker`
+```
+npm install -g backup-docker
+```
 
 ## Usage
 There are 2 main operations:
