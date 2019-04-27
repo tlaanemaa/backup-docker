@@ -26,6 +26,8 @@ _When ran with `restore` operation, backup-docker will expect these folders to e
 - `backup-docker restore` - Will restore all containers (in containers folder) and their volumes.
 - `backup-docker backup -c banana` - Will backup only the container named "banana" and all of it's volumes
 - `backup-docker restore -c banana` - Will restore only the container named "banana" and all of it's volumes
+- `backup-docker restore -c banana --only=containers` - Will restore only the container named "banana" and not it's volumes
+- `backup-docker restore -c banana --only=volumes` - Will restore the volumes attached to the container named "banana" but not the container itself. The volumes will be taken from the backed up inspection file of the container
 
 ## All options
 ```
