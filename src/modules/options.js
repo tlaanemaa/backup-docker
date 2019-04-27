@@ -80,7 +80,7 @@ const parseArgs = () => {
   }
 
   // Print help if needed
-  if (args.help) {
+  if (args && args.help) {
     // eslint-disable-next-line no-console
     console.log(usage);
     process.exit(0);
