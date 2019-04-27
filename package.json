@@ -5,9 +5,9 @@
   "main": "src/main.js",
   "scripts": {
     "start": "node .",
-    "test": "npm run lint && jest . --coverage",
+    "test": "npm run lint && jest --coverage",
     "lint": "eslint .",
-    "coveralls": "jest --coverage && cat ./coverage/lcov.info | coveralls"
+    "coveralls": "cat ./coverage/lcov.info | coveralls"
   },
   "repository": {
     "type": "git",
