@@ -35,5 +35,5 @@ _When run with `restore` operation, backup-docker will expect these folders to e
 - `-c, --containers string[]` - Optional names of the containers to backup or restore. Defaults to all containers
 - `-d, --directory string` - Optional directory name to save to or look for container backups. Defaults to current working directory
 - `-s, --socketPath string` - Optional Docker socket path. Defaults to `/var/run/docker.sock`
-- `-o, --only enum` - Optional to indicate that only containers or volumes should be backed up or restored. If only is set to "volumes" then volume names will be taken from the container inspect file in containers folder, the container is expected to already exist and it will not be paused. Defaults to both. Options: containers | volumes
+- `-o, --only enum` - Optional to indicate that only containers or volumes should be backed up or restored. If only is set to "volumes" for a "restore" operation then volume names will be taken from the container inspect file in containers folder, the container is expected to already exist and it will not be paused. Defaults to both. Options: containers | volumes
 - `-h, --help` - Prints this help page
