@@ -35,18 +35,8 @@ const restore = async () => {
 
 // Main method to run the tool
 const main = async () => {
-  switch (operation) {
-    case 'backup':
-      await backup();
-      break;
-
-    case 'restore':
-      await restore();
-      break;
-
-    default:
-      // Do nothing
-  }
+  const operations = { backup, restore };
+  return operations[operation]();
 };
 
 // Decide if we should run or export the method, based on if we're in testing env or not
