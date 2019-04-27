@@ -18,7 +18,7 @@ describe('inspect2config', () => {
         },
       ],
       Config: {
-        HostName: 'banana-host',
+        Hostname: 'banana-host',
         ExposedPorts: {
           '25565/tcp': {},
           '25575/tcp': {},
@@ -34,7 +34,7 @@ describe('inspect2config', () => {
 
     expect(config).toEqual({
       name: 'orange',
-      HostName: 'banana-host',
+      Hostname: 'banana-host',
       ExposedPorts: {
         '25565/tcp': {},
         '25575/tcp': {},
@@ -70,7 +70,7 @@ describe('inspect2config', () => {
         },
       ],
       Config: {
-        HostName: 'banana-host',
+        Hostname: 'banana-host',
         ExposedPorts: {
           '25565/tcp': {},
           '25575/tcp': {},
@@ -84,13 +84,7 @@ describe('inspect2config', () => {
       },
     });
 
-    /*
-      TODO:
-      There seems to be a bug in the portainer HostName removal thing
-      Issue created here, proceed as is appropriate after it's resolved
-      https://github.com/portainer/portainer/issues/2854
-    */
-    // expect(config.HostName).toBe(undefined);
+    expect(config.Hostname).toBe(undefined);
     expect(config.ExposedPorts).toBe(undefined);
   });
 
@@ -112,7 +106,7 @@ describe('inspect2config', () => {
         },
       ],
       Config: {
-        HostName: 'banana-host',
+        Hostname: 'banana-host',
         ExposedPorts: {
           '25565/tcp': {},
           '25575/tcp': {},
@@ -146,7 +140,7 @@ describe('inspect2config', () => {
         },
       ],
       Config: {
-        HostName: 'banana-host',
+        Hostname: 'banana-host',
         ExposedPorts: {
           '25565/tcp': {},
           '25575/tcp': {},
@@ -178,7 +172,7 @@ describe('inspect2config', () => {
         },
       ],
       Config: {
-        HostName: 'banana-host',
+        Hostname: 'banana-host',
         ExposedPorts: {
           '25565/tcp': {},
           '25575/tcp': {},
