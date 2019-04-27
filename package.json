@@ -15,7 +15,9 @@
   },
   "keywords": [
     "docker",
-    "backup"
+    "backup",
+    "inspect",
+    "volume"
   ],
   "author": "Taavi Laanemaa <taavi.laanemaa@gmail.com>",
   "license": "GPL-3.0-only",
