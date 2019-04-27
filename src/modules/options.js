@@ -70,27 +70,28 @@ const usage = commandLineUsage([
 
 // Parse args and handle errors
 const parseArgs = () => {
-  let args;
   try {
-    args = commandLineArgs(optionDefinitions);
+    const args = commandLineArgs(optionDefinitions);
 
+    // Print help if needed
+    if (args && args.help) {
+      // eslint-disable-next-line no-console
+      console.log(usage);
+      process.exit(0);
+    }
+
+    // Throw error if no operation is provided
     if (!args.operation) {
       throw new Error('Operation name must be provided!');
     }
+
+    return args;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e.message, '\nUse the --help option to see docs');
     process.exit(1);
+    throw (e);
   }
-
-  // Print help if needed
-  if (args && args.help) {
-    // eslint-disable-next-line no-console
-    console.log(usage);
-    process.exit(0);
-  }
-
-  return args;
 };
 
 module.exports = parseArgs();
