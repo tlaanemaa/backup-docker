@@ -15,7 +15,7 @@ const optionDefinitions = [
     name: 'operation',
     type: enumOf(['backup', 'restore']),
     defaultOption: true,
-    description: 'Operation to perform. Options: backup | restore',
+    description: 'Operation to perform, can be passed without the name as the first argument. Options: backup | restore',
   },
   {
     name: 'containers',
@@ -56,7 +56,7 @@ const optionDefinitions = [
 const usage = commandLineUsage([
   {
     header: 'Backup Docker',
-    content: 'A simple command line tool to backup and restore docker containers along with their volumes',
+    content: 'A simple command line tool to backup and restore docker container inspection results and their volumes',
   },
   {
     header: 'Synopsis',

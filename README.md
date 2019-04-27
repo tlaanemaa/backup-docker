@@ -1,12 +1,12 @@
 # backup-docker [![Build Status](https://travis-ci.org/tlaanemaa/backup-docker.svg?branch=master)](https://travis-ci.org/tlaanemaa/backup-docker) [![Coverage Status](https://coveralls.io/repos/github/tlaanemaa/backup-docker/badge.svg)](https://coveralls.io/github/tlaanemaa/backup-docker)
-A simple command line tool to backup and restore docker container inspection results and their volumes
+_A simple command line tool to backup and restore docker container inspection results and their volumes_
 
 **work in progess**
 
 The main idea of this package is to make backing up and restoring docker container as easy as possible while avoiding backing up information that we can easily reproduce. This is achieved by backing up only the container's inspection files and the contents of their volumes. The inspection files can then be later used to recreate the same container, with the same settings, and the volume backups can be used to restore the contents of that container's volumes.
 
 ## Installation
-_Requires [node.js](https://nodejs.org/en/download/) version 8.0 or later_
+_Requires [node.js](https://nodejs.org/en/download/) v8.0 or later_
 ```
 npm install -g backup-docker
 ```
@@ -32,13 +32,16 @@ _When run with `restore` operation, backup-docker will expect these folders to e
 
 ## All options
 ```
---operation enum            Operation to perform. Options: backup | restore                               
--c, --containers string[]   Optional names of the containers to backup or restore. Defaults to all        
-                            containers                                                                    
--d, --directory string      Optional directory name to save to or look for container backups. Defaults to 
-                            current working directory                                                     
--s, --socketPath string     Optional Docker socket path. Defaults to /var/run/docker.sock                 
--o, --only enum             Optional to indicate that only containers or volumes should be backed up or   
-                            restored. Defaults to both. Options: containers | volumes                     
--h, --help                  Prints this help page  
+--operation enum            Operation to perform, can be passed without the name as
+                            the first argument. Options: backup | restore
+-c, --containers string[]   Optional names of the containers to backup or restore.
+                            Defaults to all containers
+-d, --directory string      Optional directory name to save to or look for container
+                            backups. Defaults to current working directory
+-s, --socketPath string     Optional Docker socket path. Defaults to
+                            /var/run/docker.sock
+-o, --only enum             Optional to indicate that only containers or volumes
+                            should be backed up or restored. Defaults to both.
+                            Options: containers | volumes
+-h, --help                  Prints this help page
 ```
