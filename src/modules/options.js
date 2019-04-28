@@ -2,6 +2,9 @@ const commandLineArgs = require('command-line-args');
 const commandLineUsage = require('command-line-usage');
 const { version } = require('../../package.json');
 
+// TODO: Look into using commander instead
+// https://www.npmjs.com/package/commander
+
 // Custom enum factory
 const enumOf = (options = []) => function Enum(value) {
   if (!options.includes(value)) {
