@@ -35,35 +35,4 @@ describe('options', () => {
     expect(global.process.exit).toHaveBeenCalledTimes(1);
     expect(global.process.exit).toHaveBeenCalledWith(1);
   });
-
-  // it('should show error on wrong enum value', () => {
-  //   commandLineArgs.args = ['banana', 'banana'];
-  //   global.console.error = jest.fn();
-  //   global.process.exit = jest.fn();
-
-  //   expect(() => require('../../src/modules/options'))
-  //     .toThrow('Invalid value: banana. Available options are: ["backup","restore"]');
-  //   expect(global.console.error).toHaveBeenCalledTimes(1);
-  //   expect(global.console.error).toHaveBeenCalledWith(
-  //     'Invalid value: banana. Available options are: ["backup","restore"]',
-  //     '\nUse the --help option to see docs',
-  //   );
-  //   expect(global.process.exit).toHaveBeenCalledWith(1);
-  // });
-
-  // it('should show error if no operation name is provided', () => {
-  //   const commandLineArgs = require('command-line-args');
-  //   commandLineArgs.args = [];
-  //   global.console.error = jest.fn();
-  //   global.process.exit = jest.fn();
-
-  //   expect(() => require('../../src/modules/options'))
-  //     .toThrow('Operation name must be provided!');
-  //   expect(global.console.error).toHaveBeenCalledTimes(1);
-  //   expect(global.console.error).toHaveBeenCalledWith(
-  //     'Operation name must be provided!',
-  //     '\nUse the --help option to see docs',
-  //   );
-  //   expect(global.process.exit).toHaveBeenCalledWith(1);
-  // });
 });
