@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 require('./modules/folderStructure');
 const { operation, containers: containerNames } = require('./modules/options');
 const { getContainers, restoreContainer, backupContainer } = require('./modules/docker');
