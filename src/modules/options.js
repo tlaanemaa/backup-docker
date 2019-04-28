@@ -1,98 +1,45 @@
-const commandLineArgs = require('command-line-args');
-const commandLineUsage = require('command-line-usage');
-const { version } = require('../../package.json');
+const program = require('commander');
+const { version, name } = require('../../package.json');
 
-// Custom enum factory
-const enumOf = (options = []) => function Enum(value) {
-  if (!options.includes(value)) {
-    throw new Error(`Invalid value: ${value}. Available options are: ${JSON.stringify(options)}`);
-  }
-  return value;
-};
+const commandArgs = {};
 
-// Command line argument options
-const optionDefinitions = [
-  {
-    name: 'operation',
-    type: enumOf(['backup', 'restore']),
-    defaultOption: true,
-    description: 'Operation to perform, can be passed without the name as the first argument. Options: backup | restore',
-  },
-  {
-    name: 'containers',
-    alias: 'c',
-    type: String,
-    multiple: true,
-    defaultValue: [],
-    description: 'Optional names of the containers to backup or restore. Defaults to all containers',
-  },
-  {
-    name: 'directory',
-    alias: 'd',
-    type: String,
-    defaultValue: process.cwd(),
-    description: 'Optional directory name to save to or look for container backups. Defaults to current working directory',
-  },
-  {
-    name: 'socketPath',
-    alias: 's',
-    type: String,
-    description: 'Optional Docker socket path. Defaults to /var/run/docker.sock',
-  },
-  {
-    name: 'only',
-    alias: 'o',
-    type: enumOf(['containers', 'volumes']),
-    description: 'Optional to indicate that only containers or volumes should be backed up or restored. If only is set to "volumes" for a "restore" operation then the container is expected to already exist. Defaults to both. Options: containers | volumes',
-  },
-  {
-    name: 'help',
-    alias: 'h',
-    type: Boolean,
-    description: 'Prints this help page',
-  },
-];
+// Backup command
+program
+  .command('backup [containers...]')
+  .description('backup given or all containers in docker instance')
+  .action(async (containers) => {
+    commandArgs.operation = 'backup';
+    commandArgs.containers = containers;
+  });
 
-// Usage text
-const usage = commandLineUsage([
-  {
-    header: `Backup Docker${version ? ` v${version}` : ''}`,
-    content: 'A simple command line tool to backup and restore docker container inspection results and their volumes.\nRead more at: https://www.npmjs.com/package/backup-docker',
-  },
-  {
-    header: 'Synopsis',
-    content: 'backup-docker <backup|restore> -c [<container-name, container-name, ...>]',
-  },
-  {
-    header: 'Options',
-    optionList: optionDefinitions,
-  },
-]);
+// Restore command
+program
+  .command('restore [containers...]')
+  .description('restore given or all containers in docker instance')
+  .action(async (containers) => {
+    commandArgs.operation = 'restore';
+    commandArgs.containers = containers;
+  });
 
-// Parse args and handle errors
-const parseArgs = () => {
-  try {
-    const args = commandLineArgs(optionDefinitions);
+// Main shared options
+program
+  .name(name)
+  .version(version, '-v, --version')
+  .description('A simple command line tool to backup and restore docker container inspection results and their volumes.\nRead more at: https://www.npmjs.com/package/backup-docker')
+  .option('-d, --directory [directory]', 'directory name to save to or look for container backups', process.cwd())
+  .option('-s, --socket-path [socket-path]', 'docker socket path', '/var/run/docker.sock')
+  .option('--only-containers', 'backup/restore containers only')
+  .option('--only-volumes', 'backup/restore volumes only');
 
-    // Print help if needed
-    if (args && args.help) {
-      // eslint-disable-next-line no-console
-      console.log(usage);
-      process.exit(0);
-    }
-
-    // Throw error if no operation is provided
-    if (!args.operation) {
-      throw new Error('Operation name must be provided!');
-    }
-
-    return args;
-  } catch (e) {
+// Unknown command handler
+program
+  .command('*', { noHelp: true })
+  .action((command) => {
     // eslint-disable-next-line no-console
-    console.error(e.message, '\nUse the --help option to see docs');
+    console.error(`Unknown operation: ${command}`, '\nUse --help to see all options');
     process.exit(1);
-    throw e;
-  }
-};
+  });
 
-module.exports = parseArgs();
+program.parse(process.argv);
+
+module.exports = { ...commandArgs, ...program.opts() };
