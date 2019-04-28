@@ -8,23 +8,16 @@ const {
   saveInspect,
   loadInspect,
   volumeFileExists,
+  tryExit,
 } = require('./utils');
 
 // Volume backup directory mount path inside the container.
 const dockerBackupMountDir = '/__volume_backup_mount__';
 
 // Create docker instance using the provided socket path if available
-// We do this in a self invoking function to handle errors
-const docker = (() => {
-  try {
-    return socketPath ? new Docker({ socketPath }) : new Docker();
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error(e.message);
-    process.exit(1);
-    throw e;
-  }
-})();
+const docker = tryExit(() => (
+  socketPath ? new Docker({ socketPath }) : new Docker()
+));
 
 // Construct async limits to avoid doing too many concurrent operations
 const containerLimit = createLimiter(1);

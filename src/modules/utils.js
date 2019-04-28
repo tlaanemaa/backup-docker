@@ -46,6 +46,18 @@ const volumeFileExists = async (name) => {
   }
 };
 
+// Try catch that logs and exits on catch
+const tryExit = (func) => {
+  try {
+    return func();
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e.message);
+    process.exit(1);
+    return null;
+  }
+};
+
 // Exports
 module.exports = {
   formatContainerName,
@@ -53,4 +65,5 @@ module.exports = {
   loadInspect,
   saveInspect,
   volumeFileExists,
+  tryExit,
 };
