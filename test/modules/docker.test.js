@@ -53,7 +53,7 @@ describe('backupContainer', () => {
     const fs = require('fs');
     const dockerode = require('dockerode');
     const options = require('../../src/modules/options');
-    options.only = 'containers';
+    options.onlyContainers = true;
     const docker = require('../../src/modules/docker');
 
     await docker.backupContainer(3);
@@ -65,7 +65,7 @@ describe('backupContainer', () => {
     const fs = require('fs');
     const dockerode = require('dockerode');
     const options = require('../../src/modules/options');
-    options.only = 'volumes';
+    options.onlyVolumes = true;
     const docker = require('../../src/modules/docker');
 
     await docker.backupContainer(3);
@@ -120,7 +120,7 @@ describe('restoreContainer', () => {
   it('should only restore containers when only is containers', async () => {
     const dockerode = require('dockerode');
     const options = require('../../src/modules/options');
-    options.only = 'containers';
+    options.onlyContainers = true;
     const docker = require('../../src/modules/docker');
 
     await docker.restoreContainer('orange');
@@ -131,7 +131,7 @@ describe('restoreContainer', () => {
   it('should only restore volumes when only is volumes', async () => {
     const dockerode = require('dockerode');
     const options = require('../../src/modules/options');
-    options.only = 'volumes';
+    options.onlyVolumes = true;
     const docker = require('../../src/modules/docker');
 
     await docker.restoreContainer('orange');

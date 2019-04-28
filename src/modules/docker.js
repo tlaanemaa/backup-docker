@@ -1,6 +1,6 @@
 const Docker = require('dockerode');
 const createLimiter = require('limit-async');
-const { socketPath, only } = require('./options');
+const { socketPath, onlyContainers, onlyVolumes } = require('./options');
 const folderStructure = require('./folderStructure');
 const inspect2Config = require('./inspect2config');
 const {
@@ -31,8 +31,8 @@ const containerLimit = createLimiter(1);
 const volumeLimit = createLimiter(4);
 
 // Decide what we will operate on
-const operateOnContainers = !only || only === 'containers';
-const operateOnVolumes = !only || only === 'volumes';
+const operateOnContainers = onlyContainers || (!onlyContainers && !onlyVolumes);
+const operateOnVolumes = onlyVolumes || (!onlyVolumes && !onlyContainers);
 
 // Get all containers
 const getContainers = async (all = true) => {
