@@ -1,5 +1,6 @@
 const commandLineArgs = require('command-line-args');
 const commandLineUsage = require('command-line-usage');
+const { version } = require('../../package.json');
 
 // Custom enum factory
 const enumOf = (options = []) => function Enum(value) {
@@ -55,7 +56,7 @@ const optionDefinitions = [
 // Usage text
 const usage = commandLineUsage([
   {
-    header: 'Backup Docker',
+    header: `Backup Docker${version ? ` v${version}` : ''}`,
     content: 'A simple command line tool to backup and restore docker container inspection results and their volumes.\nRead more at: https://www.npmjs.com/package/backup-docker',
   },
   {
