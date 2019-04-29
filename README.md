@@ -1,8 +1,6 @@
 # backup-docker [![Build Status](https://travis-ci.org/tlaanemaa/backup-docker.svg?branch=master)](https://travis-ci.org/tlaanemaa/backup-docker) [![Coverage Status](https://coveralls.io/repos/github/tlaanemaa/backup-docker/badge.svg)](https://coveralls.io/github/tlaanemaa/backup-docker)
 _A simple command line tool to backup and restore docker container inspection results and their volumes_
 
-**work in progess**
-
 The main idea of this package is to make backing up and restoring docker containers as easy as possible while avoiding backing up information that we can easily reproduce. This is achieved by backing up only the container's inspection files and the contents of their volumes. The inspection files can then be later used to recreate the same container, with the same settings, and the volume backups can be used to restore the contents of that container's volumes. This way we can have a backup of everything we would need to restore the container, while not bloating the backup files.
 
 ## Installation
