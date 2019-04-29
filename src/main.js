@@ -39,6 +39,8 @@ module.exports = async () => {
     process.exit(1);
   }
 
+  // eslint-disable-next-line no-console
+  console.log('== Done ==');
   process.exit(0);
   return results;
 };
