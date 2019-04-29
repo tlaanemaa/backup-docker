@@ -4,7 +4,7 @@
   "description": "A simple command line tool to backup and restore docker containers along with their volumes",
   "main": "src/main.js",
   "scripts": {
-    "start": "node .",
+    "start": "node bin/run.js",
     "test": "npm run lint && jest --coverage --silent",
     "lint": "eslint .",
     "coveralls": "cat ./coverage/lcov.info | coveralls"
