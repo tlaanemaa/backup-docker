@@ -33,7 +33,7 @@ _When run with `restore` command, backup-docker will expect these folders to exi
 ## All options
 - `-v, --version` - output the version number
 - `-d, --directory [directory]` - directory name to save to or look for container backups (default: current working directory)
-- `-s, --socket-path [socket-path]` - docker socket path (default: "/var/run/docker.sock")
+- `-s, --socket-path [socket-path]` - docker socket path
 - `--only-containers` - backup/restore containers only
 - `--only-volumes` - backup/restore volumes only. If used with the restore command then the container is expected to already exist
 - `-h, --help` - output usage information

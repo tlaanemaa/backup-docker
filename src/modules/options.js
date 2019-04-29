@@ -27,7 +27,7 @@ program
   .version(version, '-v, --version')
   .description('A simple command line tool to backup and restore docker container inspection results and their volumes.\nRead more at: https://www.npmjs.com/package/backup-docker')
   .option('-d, --directory [directory]', 'directory name to save to or look for container backups', process.cwd())
-  .option('-s, --socket-path [socket-path]', 'docker socket path', '/var/run/docker.sock')
+  .option('-s, --socket-path [socket-path]', 'docker socket path')
   .option('--only-containers', 'backup/restore containers only')
   .option('--only-volumes', 'backup/restore volumes only. If used with the restore command then the container is expected to already exist');
 
