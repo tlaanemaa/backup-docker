@@ -18,7 +18,7 @@ const docker = socketPath ? new Docker({ socketPath }) : new Docker();
 
 // Construct async limits to avoid doing too many concurrent operations
 const containerLimit = createLimiter(1);
-const volumeLimit = createLimiter(4);
+const volumeLimit = createLimiter(1);
 
 // Decide what we will operate on
 const operateOnContainers = onlyContainers || (!onlyContainers && !onlyVolumes);
