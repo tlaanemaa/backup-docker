@@ -55,9 +55,11 @@ const backupContainer = containerLimit(async (id) => {
 
   // Backup volumes
   if (operateOnVolumes) {
-    // Pause container if it's running so it wouldn't change files while we copy them
+    // Stop container, and wait for it to stop, if it's running
+    // so it wouldn't change files while we copy them
     if (isRunning) {
-      await container.pause();
+      await container.stop();
+      await container.wait();
     }
 
     // Go over the container's volumes back them up
@@ -69,7 +71,7 @@ const backupContainer = containerLimit(async (id) => {
 
     // Unpause container if it was running
     if (isRunning) {
-      await container.unpause();
+      await container.start();
     }
   }
 

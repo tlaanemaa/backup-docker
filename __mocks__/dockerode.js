@@ -22,6 +22,8 @@ const container = {
   pause: () => Promise.resolve(),
   unpause: () => Promise.resolve(),
   start: () => Promise.resolve(),
+  stop: () => Promise.resolve(),
+  wait: () => Promise.resolve(),
 };
 
 Docker.prototype.getContainer = () => container;
