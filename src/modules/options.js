@@ -3,6 +3,16 @@ const { version, name } = require('../../package.json');
 
 const commandArgs = {};
 
+// Main shared options
+program
+  .name(name)
+  .version(version, '-v, --version')
+  .description('A simple command line tool to backup and restore docker container inspection results and their volumes.\nRead more at: https://www.npmjs.com/package/backup-docker')
+  .option('-d, --directory [directory]', 'directory name to save to or look for container backups', process.cwd())
+  .option('-s, --socket-path [socket-path]', 'docker socket path')
+  .option('--only-containers', 'backup/restore containers only')
+  .option('--only-volumes', 'backup/restore volumes only. If used with the restore command then the container is expected to already exist');
+
 // Backup command
 program
   .command('backup [containers...]')
@@ -20,16 +30,6 @@ program
     commandArgs.operation = 'restore';
     commandArgs.containers = containers;
   });
-
-// Main shared options
-program
-  .name(name)
-  .version(version, '-v, --version')
-  .description('A simple command line tool to backup and restore docker container inspection results and their volumes.\nRead more at: https://www.npmjs.com/package/backup-docker')
-  .option('-d, --directory [directory]', 'directory name to save to or look for container backups', process.cwd())
-  .option('-s, --socket-path [socket-path]', 'docker socket path')
-  .option('--only-containers', 'backup/restore containers only')
-  .option('--only-volumes', 'backup/restore volumes only. If used with the restore command then the container is expected to already exist');
 
 // Unknown command handler
 program
