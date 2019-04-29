@@ -1,6 +1,6 @@
 const Docker = require('dockerode');
 const createLimiter = require('limit-async');
-const { socketPath, onlyContainers, onlyVolumes } = require('./options');
+const { socketPath: socketPathArg, onlyContainers, onlyVolumes } = require('./options');
 const folderStructure = require('./folderStructure');
 const inspect2Config = require('./inspect2config');
 const {
@@ -13,7 +13,13 @@ const {
 // Volume backup directory mount path inside the container.
 const dockerBackupMountDir = '/__volume_backup_mount__';
 
-// Create docker instance using the provided socket path if available
+// Decide if we should provide a socket path
+const socketPath = (
+  socketPathArg
+  || (process.platform === 'win32' ? '//./pipe/docker_engine' : null)
+);
+
+// Create docker instance using the socketPath path if available
 const docker = socketPath ? new Docker({ socketPath }) : new Docker();
 
 // Construct async limits to avoid doing too many concurrent operations
