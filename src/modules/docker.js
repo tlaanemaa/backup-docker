@@ -47,7 +47,7 @@ const backupVolume = volumeLimit((containerName, volumeName, mountPoint) => dock
 // Back up single container by id
 const backupContainer = containerLimit(async (id) => {
   // eslint-disable-next-line no-console
-  console.log(`Backing up container: ${id}`);
+  console.log(`== Backing up container: ${id} ==`);
   const container = docker.getContainer(id);
   const inspect = await container.inspect();
   const name = formatContainerName(inspect.Name);
@@ -58,25 +58,33 @@ const backupContainer = containerLimit(async (id) => {
     // Stop container, and wait for it to stop, if it's running
     // so it wouldn't change files while we copy them
     if (isRunning) {
+      // eslint-disable-next-line no-console
+      console.log('Stopping container...');
       await container.stop();
       await container.wait();
     }
 
     // Go over the container's volumes back them up
+    // eslint-disable-next-line no-console
+    console.log('Starting volume backup...');
     await Promise.all(
       inspect.Mounts
         .filter(mount => mount.Name)
         .map(mount => backupVolume(name, mount.Name, mount.Destination)),
     );
 
-    // Unpause container if it was running
+    // Start container if it was running
     if (isRunning) {
+      // eslint-disable-next-line no-console
+      console.log('Starting container...');
       await container.start();
     }
   }
 
   // Backup container
   if (operateOnContainers) {
+    // eslint-disable-next-line no-console
+    console.log('Saving container inspect...');
     await saveInspect(inspect);
   }
 
@@ -100,14 +108,18 @@ const restoreVolume = volumeLimit((containerName, tarName, mountPoint) => docker
 // Restore (create) container by id
 const restoreContainer = containerLimit(async (name) => {
   // eslint-disable-next-line no-console
-  console.log(`Restoring container: ${name}`);
+  console.log(`== Restoring container: ${name} ==`);
   const backupInspect = await loadInspect(name);
 
   // Restore container
   let container = null;
   if (operateOnContainers) {
+    // eslint-disable-next-line no-console
+    console.log('Creating container...');
     container = await docker.createContainer(inspect2Config(backupInspect));
   } else {
+    // eslint-disable-next-line no-console
+    console.log('Getting container...');
     container = await docker.getContainer(name);
   }
 
@@ -117,12 +129,18 @@ const restoreContainer = containerLimit(async (name) => {
 
   // Restore volumes
   if (operateOnVolumes) {
-    // Pause container if it's running so it wouldn't change files while we copy them
+    // Stop container, and wait for it to stop, if it's running
+    // so it wouldn't change files while we copy them
     if (isRunning) {
-      await container.pause();
+      // eslint-disable-next-line no-console
+      console.log('Stopping container...');
+      await container.stop();
+      await container.wait();
     }
 
     // Go over the container's volumes, check if they have a backup file and restore if they do
+    // eslint-disable-next-line no-console
+    console.log('Starting volume restore...');
     await Promise.all(
       inspect.Mounts
         .filter(mount => mount.Name)
@@ -136,9 +154,11 @@ const restoreContainer = containerLimit(async (name) => {
         }),
     );
 
-    // Unpause container if it was running
+    // Start container if it was running
     if (isRunning) {
-      await container.unpause();
+      // eslint-disable-next-line no-console
+      console.log('Starting container...');
+      await container.start();
     }
   }
 
@@ -148,6 +168,8 @@ const restoreContainer = containerLimit(async (name) => {
     && backupInspect.State.Running
     && !inspect.State.Running
   ) {
+    // eslint-disable-next-line no-console
+    console.log('Starting container...');
     await container.start();
   }
 
