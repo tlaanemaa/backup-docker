@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-require('./modules/folderStructure');
 const { operation, containers: containerNames } = require('./modules/options');
 const { getContainers, restoreContainer, backupContainer } = require('./modules/docker');
 const { getAllInspects, asyncTryLog } = require('./modules/utils');
@@ -27,14 +25,7 @@ const restore = async () => {
 };
 
 // Main method to run the tool
-const main = () => {
+module.exports = () => {
   const operations = { backup, restore };
   return operations[operation]();
 };
-
-// Decide if we should run or export the method, based on if we're in testing env or not
-if (process.env.NODE_ENV === 'test') {
-  module.exports = main;
-} else {
-  main();
-}

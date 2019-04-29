@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "coveralls": "cat ./coverage/lcov.info | coveralls"
   },
-  "bin": "./src/main.js",
+  "bin": "./bin/run.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tlaanemaa/backup-docker.git"
