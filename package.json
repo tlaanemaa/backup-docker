@@ -5,7 +5,7 @@
   "main": "src/main.js",
   "scripts": {
     "start": "node .",
-    "test": "npm run lint && jest --coverage",
+    "test": "npm run lint && jest --coverage --silent",
     "lint": "eslint .",
     "coveralls": "cat ./coverage/lcov.info | coveralls"
   },
