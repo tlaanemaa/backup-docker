@@ -27,7 +27,18 @@ const restore = async () => {
 // Main method to run the tool
 module.exports = async () => {
   const operations = { backup, restore };
-  const result = await operations[operation]();
+  const results = await operations[operation]();
+
+  // Check if we had any errors and log them again if there are
+  const errors = results.filter(result => result instanceof Error);
+  if (errors.length) {
+    // eslint-disable-next-line no-console
+    console.error('\nThe following errors occurred during the run (this does not include errors from the tar command used for volume backup/restore):');
+    // eslint-disable-next-line no-console
+    errors.map(err => console.error(err.message));
+    process.exit(1);
+  }
+
   process.exit(0);
-  return result;
+  return results;
 };
