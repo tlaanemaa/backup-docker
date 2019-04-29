@@ -8,16 +8,13 @@ const {
   saveInspect,
   loadInspect,
   volumeFileExists,
-  tryExit,
 } = require('./utils');
 
 // Volume backup directory mount path inside the container.
 const dockerBackupMountDir = '/__volume_backup_mount__';
 
 // Create docker instance using the provided socket path if available
-const docker = tryExit(() => (
-  socketPath ? new Docker({ socketPath }) : new Docker()
-));
+const docker = socketPath ? new Docker({ socketPath }) : new Docker();
 
 // Construct async limits to avoid doing too many concurrent operations
 const containerLimit = createLimiter(1);
@@ -78,10 +75,10 @@ const backupContainer = containerLimit(async (id) => {
 
   // Backup container
   if (operateOnContainers) {
-    return saveInspect(inspect);
+    await saveInspect(inspect);
   }
 
-  return null;
+  return true;
 });
 
 // Restore volume contents from a tar archive
@@ -109,7 +106,7 @@ const restoreContainer = containerLimit(async (name) => {
   if (operateOnContainers) {
     container = await docker.createContainer(inspect2Config(backupInspect));
   } else {
-    container = docker.getContainer(name);
+    container = await docker.getContainer(name);
   }
 
   // Get restored (or existing if only === 'volumes) container's inspect
@@ -152,7 +149,7 @@ const restoreContainer = containerLimit(async (name) => {
     await container.start();
   }
 
-  return container;
+  return true;
 });
 
 // Exports

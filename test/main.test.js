@@ -38,11 +38,12 @@ describe('backup', () => {
     const options = require('../src/modules/options');
     options.containers = ['pear'];
     const docker = require('../src/modules/docker');
-    docker.backupContainer = () => { throw new Error('Mock backup error'); };
+    const mockError = new Error('Mock backup error');
+    docker.backupContainer = () => { throw mockError; };
     const main = require('../src/main');
 
     const result = await main();
-    expect(result).toEqual([false]);
+    expect(result).toEqual([mockError]);
   });
 });
 
@@ -84,10 +85,11 @@ describe('restore', () => {
     options.operation = 'restore';
     options.containers = ['pear'];
     const docker = require('../src/modules/docker');
-    docker.restoreContainer = () => { throw new Error('Mock restore error'); };
+    const mockError = new Error('Mock restore error');
+    docker.restoreContainer = () => { throw mockError; };
     const main = require('../src/main');
 
     const result = await main();
-    expect(result).toEqual([false]);
+    expect(result).toEqual([mockError]);
   });
 });
