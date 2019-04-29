@@ -28,6 +28,8 @@ const restore = async () => {
 module.exports = async () => {
   const operations = { backup, restore };
   const results = await operations[operation]();
+  // eslint-disable-next-line no-console
+  console.log('== Done ==');
 
   // Check if we had any errors and log them again if there are
   const errors = results.filter(result => result instanceof Error);
@@ -39,8 +41,6 @@ module.exports = async () => {
     process.exit(1);
   }
 
-  // eslint-disable-next-line no-console
-  console.log('== Done ==');
   process.exit(0);
   return results;
 };
