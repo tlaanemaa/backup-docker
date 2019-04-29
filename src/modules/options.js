@@ -40,6 +40,13 @@ program
     process.exit(1);
   });
 
+// Parse args
 program.parse(process.argv);
+
+// Show help if no operation is provided
+if (!commandArgs.operation) {
+  program.outputHelp();
+  process.exit(1);
+}
 
 module.exports = { ...commandArgs, ...program.opts() };
