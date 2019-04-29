@@ -12,7 +12,7 @@ npm install -g backup-docker
 ```
 
 ## Usage
-There are 2 main operations:
+There are 2 main commands:
 - `backup` - Creates a backup of the given container, or all if none is specified, and it's volumes
 - `restore` - Restores containers and volumes from existing backup files. 
 
@@ -20,20 +20,20 @@ When run, two directories are created if not already present in the target direc
 - `containers` - Used to store container inspection files as .json files
 - `volumes` - Used to store the contents of volumes as .tar files
 
-_When run with `restore` operation, backup-docker will expect these folders to exist in the target directory, if they don't, it will create them_
+_When run with `restore` command, backup-docker will expect these folders to exist in the target directory, if they don't, it will create them_
 
 ## Examples
 - `backup-docker backup` - Will backup all containers in the docker instance, and their volumes
 - `backup-docker restore` - Will restore all containers in containers folder, and their volumes
-- `backup-docker backup -c banana` - Will backup only the container named "banana" and all of it's volumes
-- `backup-docker restore -c banana` - Will restore only the container named "banana" and all of it's volumes
-- `backup-docker restore -c banana --only=containers` - Will restore only the container named "banana" and not it's volumes
-- `backup-docker restore -c banana --only=volumes` - Will restore the volumes attached to the container named "banana" but not the container itself. The container itself must already exist in the docker instance
+- `backup-docker backup banana` - Will backup only the container named "banana" and all of it's volumes
+- `backup-docker restore banana mango` - Will restore only the containers named "banana" and "mango" and all of their volumes
+- `backup-docker restore banana --only=containers` - Will restore only the container named "banana" and not it's volumes
+- `backup-docker restore banana --only=volumes` - Will restore the volumes attached to the container named "banana" but not the container itself. The container itself must already exist in the docker instance
 
 ## All options
-- `--operation enum` - Operation to perform, can be passed without the name as the first argument. Options: backup | restore
-- `-c, --containers string[]` - Optional names of the containers to backup or restore. Defaults to all containers
-- `-d, --directory string` - Optional directory name to save to or look for container backups. Defaults to current working directory
-- `-s, --socketPath string` - Optional Docker socket path. Defaults to `/var/run/docker.sock`
-- `-o, --only enum` - Optional to indicate that only containers or volumes should be backed up or restored. If only is set to "volumes" for a "restore" operation then the container is expected to already exist. Defaults to both. Options: containers | volumes
-- `-h, --help` - Prints this help page
+- `-v, --version` - output the version number
+- `-d, --directory [directory]` - directory name to save to or look for container backups (default: current working directory)
+- `-s, --socketPath string` - docker socket path (default: "/var/run/docker.sock")
+- `--only-containers` - backup/restore containers only
+- `--only-volumes` - backup/restore volumes only. If used with the restore command then the container is expected to already exist
+- `-h, --help` - output usage information

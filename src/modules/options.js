@@ -29,7 +29,7 @@ program
   .option('-d, --directory [directory]', 'directory name to save to or look for container backups', process.cwd())
   .option('-s, --socket-path [socket-path]', 'docker socket path', '/var/run/docker.sock')
   .option('--only-containers', 'backup/restore containers only')
-  .option('--only-volumes', 'backup/restore volumes only');
+  .option('--only-volumes', 'backup/restore volumes only. If used with the restore command then the container is expected to already exist');
 
 // Unknown command handler
 program
