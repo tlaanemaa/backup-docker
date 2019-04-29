@@ -11,6 +11,7 @@ describe('backup', () => {
     const options = require('../src/modules/options');
     options.containers = [];
     const docker = require('../src/modules/docker');
+    global.process.exit = jest.fn();
     const main = require('../src/main');
 
     const result = await main();
@@ -19,12 +20,14 @@ describe('backup', () => {
     expect(docker.getContainers).toHaveBeenCalledTimes(1);
     expect(docker.backupContainer).toHaveBeenCalledTimes(3);
     expect(docker.backupContainer).toHaveBeenLastCalledWith(8);
+    expect(global.process.exit).toHaveBeenCalledWith(0);
   });
 
   it('should backup the given container', async () => {
     const options = require('../src/modules/options');
     options.containers = ['pear'];
     const docker = require('../src/modules/docker');
+    global.process.exit = jest.fn();
     const main = require('../src/main');
 
     await main();
@@ -32,6 +35,7 @@ describe('backup', () => {
     expect(docker.getContainers).toHaveBeenCalledTimes(0);
     expect(docker.backupContainer).toHaveBeenCalledTimes(1);
     expect(docker.backupContainer).toHaveBeenLastCalledWith('pear');
+    expect(global.process.exit).toHaveBeenCalledWith(0);
   });
 
   it('should catch errors and return false', async () => {
@@ -40,10 +44,12 @@ describe('backup', () => {
     const docker = require('../src/modules/docker');
     const mockError = new Error('Mock backup error');
     docker.backupContainer = () => { throw mockError; };
+    global.process.exit = jest.fn();
     const main = require('../src/main');
 
     const result = await main();
     expect(result).toEqual([mockError]);
+    expect(global.process.exit).toHaveBeenCalledWith(0);
   });
 });
 
@@ -54,6 +60,7 @@ describe('restore', () => {
     options.operation = 'restore';
     options.containers = [];
     const docker = require('../src/modules/docker');
+    global.process.exit = jest.fn();
     const main = require('../src/main');
 
     const result = await main();
@@ -63,6 +70,7 @@ describe('restore', () => {
     expect(fs.readdir).toHaveBeenCalledWith('/folder/containers', expect.any(Function));
     expect(docker.restoreContainer).toHaveBeenCalledTimes(3);
     expect(docker.restoreContainer).toHaveBeenLastCalledWith('c');
+    expect(global.process.exit).toHaveBeenCalledWith(0);
   });
 
   it('should restore the given container', async () => {
@@ -71,6 +79,7 @@ describe('restore', () => {
     options.operation = 'restore';
     options.containers = ['mango'];
     const docker = require('../src/modules/docker');
+    global.process.exit = jest.fn();
     const main = require('../src/main');
 
     await main();
@@ -78,6 +87,7 @@ describe('restore', () => {
     expect(fs.readdir).toHaveBeenCalledTimes(0);
     expect(docker.restoreContainer).toHaveBeenCalledTimes(1);
     expect(docker.restoreContainer).toHaveBeenLastCalledWith('mango');
+    expect(global.process.exit).toHaveBeenCalledWith(0);
   });
 
   it('should catch errors and return false', async () => {
@@ -87,9 +97,11 @@ describe('restore', () => {
     const docker = require('../src/modules/docker');
     const mockError = new Error('Mock restore error');
     docker.restoreContainer = () => { throw mockError; };
+    global.process.exit = jest.fn();
     const main = require('../src/main');
 
     const result = await main();
     expect(result).toEqual([mockError]);
+    expect(global.process.exit).toHaveBeenCalledWith(0);
   });
 });

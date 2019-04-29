@@ -25,7 +25,9 @@ const restore = async () => {
 };
 
 // Main method to run the tool
-module.exports = () => {
+module.exports = async () => {
   const operations = { backup, restore };
-  return operations[operation]();
+  const result = await operations[operation]();
+  process.exit(0);
+  return result;
 };
