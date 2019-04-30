@@ -66,8 +66,8 @@ describe('restore', () => {
     const result = await main();
 
     expect(result).toEqual([true, true, true]);
-    expect(fs.readdir).toHaveBeenCalledTimes(1);
-    expect(fs.readdir).toHaveBeenCalledWith('/folder/containers', expect.any(Function));
+    expect(fs.readdirSync).toHaveBeenCalledTimes(1);
+    expect(fs.readdirSync).toHaveBeenCalledWith('/folder/containers');
     expect(docker.restoreContainer).toHaveBeenCalledTimes(3);
     expect(docker.restoreContainer).toHaveBeenLastCalledWith('c');
     expect(global.process.exit).toHaveBeenCalledWith(0);

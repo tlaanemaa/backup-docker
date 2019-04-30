@@ -1,6 +1,6 @@
 const { operation, containers: containerNames } = require('./modules/options');
 const { getContainers, restoreContainer, backupContainer } = require('./modules/docker');
-const { getAllInspects, asyncTryLog } = require('./modules/utils');
+const { getInspectFilesSync, asyncTryLog } = require('./modules/utils');
 
 // Main backup function
 const backup = async () => {
@@ -17,7 +17,7 @@ const backup = async () => {
 const restore = async () => {
   const containers = containerNames.length
     ? containerNames
-    : await asyncTryLog(() => getAllInspects(), true);
+    : getInspectFilesSync();
 
   return Promise.all(containers.map(
     container => asyncTryLog(() => restoreContainer(container)),

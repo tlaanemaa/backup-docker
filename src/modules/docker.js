@@ -7,7 +7,7 @@ const {
   formatContainerName,
   saveInspect,
   loadInspect,
-  volumeFileExists,
+  getVolumeFilesSync,
 } = require('./utils');
 
 // Volume backup directory mount path inside the container.
@@ -23,6 +23,9 @@ const volumeLimit = createLimiter(1);
 // Decide what we will operate on
 const operateOnContainers = onlyContainers || (!onlyContainers && !onlyVolumes);
 const operateOnVolumes = onlyVolumes || (!onlyVolumes && !onlyContainers);
+
+// If we know that we will operate on volumes, get all volume files in advance
+const volumeFiles = operateOnVolumes ? getVolumeFilesSync() : [];
 
 // Get all containers
 const getContainers = async (all = true) => {
@@ -55,29 +58,33 @@ const backupContainer = containerLimit(async (id) => {
 
   // Backup volumes
   if (operateOnVolumes) {
-    // Stop container, and wait for it to stop, if it's running
-    // so it wouldn't change files while we copy them
-    if (isRunning) {
-      // eslint-disable-next-line no-console
-      console.log('Stopping container...');
-      await container.stop();
-      await container.wait();
-    }
+    // Extract and filter volumes to know if we have anything to backup
+    const volumes = inspect.Mounts.filter(mount => mount.Name);
 
-    // Go over the container's volumes back them up
-    // eslint-disable-next-line no-console
-    console.log('Starting volume backup...');
-    await Promise.all(
-      inspect.Mounts
-        .filter(mount => mount.Name)
-        .map(mount => backupVolume(name, mount.Name, mount.Destination)),
-    );
+    // Only go ahead if we actually have any volumes
+    if (volumes.length) {
+      // Stop container, and wait for it to stop, if it's running
+      // so it wouldn't change files while we copy them
+      if (isRunning) {
+        // eslint-disable-next-line no-console
+        console.log('Stopping container...');
+        await container.stop();
+        await container.wait();
+      }
 
-    // Start container if it was running
-    if (isRunning) {
+      // Go over the container's volumes and back them up
       // eslint-disable-next-line no-console
-      console.log('Starting container...');
-      await container.start();
+      console.log('Starting volume backup...');
+      await Promise.all(
+        volumes.map(volume => backupVolume(name, volume.Name, volume.Destination)),
+      );
+
+      // Start container if it was running
+      if (isRunning) {
+        // eslint-disable-next-line no-console
+        console.log('Starting container...');
+        await container.start();
+      }
     }
   }
 
@@ -129,36 +136,34 @@ const restoreContainer = containerLimit(async (name) => {
 
   // Restore volumes
   if (operateOnVolumes) {
-    // Stop container, and wait for it to stop, if it's running
-    // so it wouldn't change files while we copy them
-    if (isRunning) {
-      // eslint-disable-next-line no-console
-      console.log('Stopping container...');
-      await container.stop();
-      await container.wait();
-    }
+    // Extract and filter volumes to know if we have anything to restore
+    const volumes = inspect.Mounts
+      .filter(mount => mount.Name && volumeFiles.includes(mount.Name));
 
-    // Go over the container's volumes, check if they have a backup file and restore if they do
-    // eslint-disable-next-line no-console
-    console.log('Starting volume restore...');
-    await Promise.all(
-      inspect.Mounts
-        .filter(mount => mount.Name)
-        .map(async (mount) => {
-          const fileExists = await volumeFileExists(mount.Name);
-          return (
-            fileExists
-              ? restoreVolume(name, mount.Name, mount.Destination)
-              : null
-          );
-        }),
-    );
+    // Only go ahead if we actually have backup files to restore
+    if (volumes.length) {
+      // Stop container, and wait for it to stop, if it's running
+      // so it wouldn't change files while we copy them
+      if (isRunning) {
+        // eslint-disable-next-line no-console
+        console.log('Stopping container...');
+        await container.stop();
+        await container.wait();
+      }
 
-    // Start container if it was running
-    if (isRunning) {
+      // Go over the container's volumes and restore their contents
       // eslint-disable-next-line no-console
-      console.log('Starting container...');
-      await container.start();
+      console.log('Starting volume restore...');
+      await Promise.all(
+        volumes.map(volume => restoreVolume(name, volume.Name, volume.Destination)),
+      );
+
+      // Start container if it was running
+      if (isRunning) {
+        // eslint-disable-next-line no-console
+        console.log('Starting container...');
+        await container.start();
+      }
     }
   }
 
