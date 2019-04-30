@@ -43,7 +43,7 @@ const saveInspect = (inspect) => {
 };
 
 // Get all volume backups synchronously
-const getVolumeFilesSync = () => getFilesSync(folderStructure.containers, '.tar')
+const getVolumeFilesSync = () => getFilesSync(folderStructure.volumes, '.tar')
   .map(file => path.basename(file, path.extname(file)));
 
 // Helper to catch and log errors on async functions
