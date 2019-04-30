@@ -148,6 +148,19 @@ describe('restoreContainer', () => {
     );
   });
 
+  it('should start the container if it was backed up in a running state', async () => {
+    const dockerode = require('dockerode');
+    dockerode.mockContainer.stop = jest.fn();
+    dockerode.mockContainer.start = jest.fn();
+    dockerode.mockInspection.State.Running = false;
+    const docker = require('../../src/modules/docker');
+
+    await docker.restoreContainer('orange');
+
+    expect(dockerode.mockContainer.stop).toHaveBeenCalledTimes(0);
+    expect(dockerode.mockContainer.start).toHaveBeenCalledTimes(1);
+  });
+
   it('should only restore containers when only is containers', async () => {
     const dockerode = require('dockerode');
     const options = require('../../src/modules/options');
