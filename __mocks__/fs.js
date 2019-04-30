@@ -29,5 +29,7 @@ const mockInspectFile = `
 fs.writeFile = jest.fn().mockImplementation((x, y, callback) => callback());
 fs.readFile = jest.fn().mockImplementation((x, callback) => callback(null, mockInspectFile));
 fs.readdirSync = jest.fn().mockReturnValue(['a.json', 'b.json', 'c.json']);
+fs.existsSync = jest.fn().mockReturnValue(false);
+fs.mkdirSync = jest.fn();
 
 module.exports = fs;
