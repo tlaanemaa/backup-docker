@@ -14,7 +14,7 @@ const formatContainerName = name => name.replace(/^\//g, '');
 // Get contents of a folder synchronously
 const getFilesSync = (folder, extension) => {
   try {
-    const files = fs.readDirSync(folder);
+    const files = fs.readdirSync(folder);
     return files.filter(file => path.extname(file) === extension);
   } catch (e) {
     // eslint-disable-next-line no-console
