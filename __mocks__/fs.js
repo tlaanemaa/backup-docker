@@ -29,6 +29,5 @@ const mockInspectFile = `
 fs.writeFile = jest.fn().mockImplementation((x, y, callback) => callback());
 fs.readFile = jest.fn().mockImplementation((x, callback) => callback(null, mockInspectFile));
 fs.readdir = jest.fn().mockImplementation((x, callback) => callback(null, ['a.json', 'b.json', 'c.json']));
-fs.access = jest.fn().mockImplementation((x, y, callback) => callback());
 
 module.exports = fs;

@@ -7,10 +7,22 @@ const folderStructure = require('./folderStructure');
 const writeFile = promisify(fs.writeFile);
 const readFile = promisify(fs.readFile);
 const readDir = promisify(fs.readdir);
-const access = promisify(fs.access);
 
 // Format container names
 const formatContainerName = name => name.replace(/^\//g, '');
+
+// Get contents of a folder synchronously
+const getFilesSync = (folder, extension) => {
+  try {
+    const files = fs.readDirSync(folder);
+    return files.filter(file => path.extname(file) === extension);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e.message);
+    process.exit(1);
+    throw e;
+  }
+};
 
 // Get all container inspects files
 const getAllInspects = async () => {
@@ -35,16 +47,9 @@ const saveInspect = (inspect) => {
   return writeFile(filePath, inspectString);
 };
 
-// Check if a volume backup exists
-const volumeFileExists = async (name) => {
-  const filePath = path.join(folderStructure.volumes, `${name}.tar`);
-  try {
-    await access(filePath, fs.constants.R_OK);
-    return true;
-  } catch (e) {
-    return false;
-  }
-};
+// Get all volume backups synchronously
+const getVolumeFilesSync = () => getFilesSync(folderStructure.containers, '.tar')
+  .map(file => path.basename(file, path.extname(file)));
 
 // Helper to catch and log errors on async functions
 const asyncTryLog = async (func, exit = false) => {
@@ -66,6 +71,6 @@ module.exports = {
   getAllInspects,
   loadInspect,
   saveInspect,
-  volumeFileExists,
+  getVolumeFilesSync,
   asyncTryLog,
 };
