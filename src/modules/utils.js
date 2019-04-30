@@ -6,7 +6,6 @@ const folderStructure = require('./folderStructure');
 // Promisified fs helpers
 const writeFile = promisify(fs.writeFile);
 const readFile = promisify(fs.readFile);
-const readDir = promisify(fs.readdir);
 
 // Format container names
 const formatContainerName = name => name.replace(/^\//g, '');
@@ -24,13 +23,9 @@ const getFilesSync = (folder, extension) => {
   }
 };
 
-// Get all container inspects files
-const getAllInspects = async () => {
-  const files = await readDir(folderStructure.containers);
-  return files
-    .filter(file => path.extname(file) === '.json')
-    .map(file => path.basename(file, path.extname(file)));
-};
+// Get all container inspect backups synchronously
+const getInspectFilesSync = () => getFilesSync(folderStructure.containers, '.json')
+  .map(file => path.basename(file, path.extname(file)));
 
 // Load container inspects
 const loadInspect = async (name) => {
@@ -68,7 +63,7 @@ const asyncTryLog = async (func, exit = false) => {
 // Exports
 module.exports = {
   formatContainerName,
-  getAllInspects,
+  getInspectFilesSync,
   loadInspect,
   saveInspect,
   getVolumeFilesSync,
