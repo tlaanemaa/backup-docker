@@ -98,6 +98,8 @@ describe('restoreContainer', () => {
   });
 
   it('should untar volumes', async () => {
+    const fs = require('fs');
+    fs.readdirSync = jest.fn().mockImplementation(() => ['mount1.tar', 'mount2.tar']);
     const dockerode = require('dockerode');
     const docker = require('../../src/modules/docker');
 
@@ -129,6 +131,8 @@ describe('restoreContainer', () => {
   });
 
   it('should only restore volumes when only is volumes', async () => {
+    const fs = require('fs');
+    fs.readdirSync = jest.fn().mockImplementation(() => ['mount1.tar', 'mount2.tar']);
     const dockerode = require('dockerode');
     const options = require('../../src/modules/options');
     options.onlyVolumes = true;
