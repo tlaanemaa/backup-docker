@@ -9,11 +9,13 @@ const mockInspectFile = `
   "Mounts": [
     {
       "Name": "mount1",
-      "Destination": "dest1"
+      "Destination": "dest1",
+      "Type": "volume"
     },
     {
       "Name": "mount2",
-      "Destination": "dest2"
+      "Destination": "dest2",
+      "Type": "volume"
     }
   ],
   "Config": {},

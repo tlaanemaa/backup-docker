@@ -59,7 +59,8 @@ const backupContainer = containerLimit(async (id) => {
   // Backup volumes
   if (operateOnVolumes) {
     // Extract and filter volumes to know if we have anything to backup
-    const volumes = inspect.Mounts.filter(mount => mount.Name);
+    const volumes = inspect.Mounts
+      .filter(mount => mount.Name && mount.Type === 'volume');
 
     // Only go ahead if we actually have any volumes
     if (volumes.length) {
@@ -138,7 +139,7 @@ const restoreContainer = containerLimit(async (name) => {
   if (operateOnVolumes) {
     // Extract and filter volumes to know if we have anything to restore
     const volumes = inspect.Mounts
-      .filter(mount => mount.Name && volumeFiles.includes(mount.Name));
+      .filter(mount => mount.Name && mount.Type === 'volume' && volumeFiles.includes(mount.Name));
 
     // Only go ahead if we actually have backup files to restore
     if (volumes.length) {

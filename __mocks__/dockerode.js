@@ -12,8 +12,8 @@ Docker.mockInspection = {
     Running: true,
   },
   Mounts: [
-    { Name: 'mount1', Destination: 'dest1' },
-    { Name: 'mount2', Destination: 'dest2' },
+    { Name: 'mount1', Destination: 'dest1', Type: 'volume' },
+    { Name: 'mount2', Destination: 'dest2', Type: 'volume' },
   ],
 };
 
