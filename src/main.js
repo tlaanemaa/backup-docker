@@ -10,7 +10,7 @@ module.exports = async () => {
   // Check if we had any errors and throw them if we did
   const errors = results.filter(result => result instanceof Error);
   if (errors.length) {
-    const errorHeader = '\nThe following errors occurred during the run (this does not include errors from the tar command used for volume backup/restore):';
+    const errorHeader = '\nThe following errors occurred during the run (this does not include errors from the tar command used for volume backup/restore):\n';
     const errorMessages = errors.map(e => e.message).join('\n');
     throw new Error(errorHeader + errorMessages);
   }
