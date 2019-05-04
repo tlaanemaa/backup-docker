@@ -10,6 +10,9 @@ const {
   getVolumeFilesSync,
 } = require('./utils');
 
+// Name of the image we will use for volume operations
+const volumeOperationsImage = 'ubuntu';
+
 // Volume backup directory mount path inside the container.
 const dockerBackupMountDir = '/__volume_backup_mount__';
 
@@ -33,9 +36,24 @@ const getContainers = async (all = true) => {
   return containers.map(container => container.Id);
 };
 
+// Helper to start container and log
+const startContainer = (container) => {
+  // eslint-disable-next-line no-console
+  console.log('Starting container...');
+  return container.start();
+};
+
+// Helper to stop container, wait and log
+const stopContainer = async (container) => {
+  // eslint-disable-next-line no-console
+  console.log('Stopping container...');
+  await container.stop();
+  return container.wait();
+};
+
 // Backup volume as a tar file
 const backupVolume = volumeLimit((containerName, volumeName, mountPoint) => docker.run(
-  'ubuntu',
+  volumeOperationsImage,
   ['tar', 'cvf', `${dockerBackupMountDir}/${volumeName}.tar`, mountPoint],
   process.stdout,
   {
@@ -67,10 +85,7 @@ const backupContainer = containerLimit(async (id) => {
       // Stop container, and wait for it to stop, if it's running
       // so it wouldn't change files while we copy them
       if (isRunning) {
-        // eslint-disable-next-line no-console
-        console.log('Stopping container...');
-        await container.stop();
-        await container.wait();
+        await stopContainer(container);
       }
 
       // Go over the container's volumes and back them up
@@ -82,9 +97,7 @@ const backupContainer = containerLimit(async (id) => {
 
       // Start container if it was running
       if (isRunning) {
-        // eslint-disable-next-line no-console
-        console.log('Starting container...');
-        await container.start();
+        await startContainer(container);
       }
     }
   }
@@ -101,7 +114,7 @@ const backupContainer = containerLimit(async (id) => {
 
 // Restore volume contents from a tar archive
 const restoreVolume = volumeLimit((containerName, tarName, mountPoint) => docker.run(
-  'ubuntu',
+  volumeOperationsImage,
   ['tar', 'xvf', `${dockerBackupMountDir}/${tarName}.tar`, '--strip', '1', '--directory', mountPoint],
   process.stdout,
   {
@@ -146,10 +159,7 @@ const restoreContainer = containerLimit(async (name) => {
       // Stop container, and wait for it to stop, if it's running
       // so it wouldn't change files while we copy them
       if (isRunning) {
-        // eslint-disable-next-line no-console
-        console.log('Stopping container...');
-        await container.stop();
-        await container.wait();
+        await stopContainer(container);
       }
 
       // Go over the container's volumes and restore their contents
@@ -161,9 +171,7 @@ const restoreContainer = containerLimit(async (name) => {
 
       // Start container if it was running
       if (isRunning) {
-        // eslint-disable-next-line no-console
-        console.log('Starting container...');
-        await container.start();
+        await startContainer(container);
       }
     }
   }
@@ -174,9 +182,7 @@ const restoreContainer = containerLimit(async (name) => {
     && backupInspect.State.Running
     && !inspect.State.Running
   ) {
-    // eslint-disable-next-line no-console
-    console.log('Starting container...');
-    await container.start();
+    await startContainer(container);
   }
 
   return true;
