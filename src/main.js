@@ -1,4 +1,3 @@
-require('./modules/globalErrorHandlers');
 const { operation, containers: containerNames } = require('./modules/options');
 const { getContainers, restoreContainer, backupContainer } = require('./modules/docker');
 const { getInspectFilesSync, asyncTryLog } = require('./modules/utils');
@@ -32,16 +31,13 @@ module.exports = async () => {
   // eslint-disable-next-line no-console
   console.log('== Done ==');
 
-  // Check if we had any errors and log them again if there are
+  // Check if we had any errors and throw them if there are
   const errors = results.filter(result => result instanceof Error);
   if (errors.length) {
-    throw new Error([
-      '\nThe following errors occurred during the run (this does not include errors from the tar command used for volume backup/restore):',
-      errors.map(e => e.message).join('\n'),
-    ].join('\n'));
+    const errorHeader = '\nThe following errors occurred during the run (this does not include errors from the tar command used for volume backup/restore):';
+    const errorMessages = errors.map(e => e.message).join('\n');
+    throw new Error(errorHeader + errorMessages);
   }
 
-  // Safeguard against hanging application
-  process.exit(0);
   return results;
 };
