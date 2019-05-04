@@ -152,6 +152,8 @@ const restoreContainer = containerLimit(async (name) => {
   // Restore container
   let container = null;
   if (operateOnContainers) {
+    await pullImage(backupInspect.Config.Image);
+
     // eslint-disable-next-line no-console
     console.log('Creating container...');
     container = await docker.createContainer(inspect2Config(backupInspect));
