@@ -28,12 +28,21 @@ const operateOnContainers = onlyContainers || (!onlyContainers && !onlyVolumes);
 const operateOnVolumes = onlyVolumes || (!onlyVolumes && !onlyContainers);
 
 // If we know that we will operate on volumes, get all volume files in advance
+// Also initialize a variable for pulling the volume operations image if needed
 const volumeFiles = operateOnVolumes ? getVolumeFilesSync() : [];
+let volumeImagePromise = Promise.resolve();
 
 // Get all containers
 const getContainers = async (all = true) => {
   const containers = await docker.listContainers({ all });
   return containers.map(container => container.Id);
+};
+
+// Helper to pull an image and log
+const pullImage = (name) => {
+  // eslint-disable-next-line no-console
+  console.log(`Pulling image: ${name}`);
+  return docker.pull(name);
 };
 
 // Helper to start container and log
@@ -69,6 +78,10 @@ const backupVolume = volumeLimit((containerName, volumeName, mountPoint) => dock
 const backupContainer = containerLimit(async (id) => {
   // eslint-disable-next-line no-console
   console.log(`== Backing up container: ${id} ==`);
+
+  // Wait for the volume operations image to be downloaded before proceeding
+  await volumeImagePromise;
+
   const container = docker.getContainer(id);
   const inspect = await container.inspect();
   const name = formatContainerName(inspect.Name);
@@ -130,6 +143,10 @@ const restoreVolume = volumeLimit((containerName, tarName, mountPoint) => docker
 const restoreContainer = containerLimit(async (name) => {
   // eslint-disable-next-line no-console
   console.log(`== Restoring container: ${name} ==`);
+
+  // Wait for the volume operations image to be downloaded before proceeding
+  await volumeImagePromise;
+
   const backupInspect = await loadInspect(name);
 
   // Restore container
@@ -187,6 +204,11 @@ const restoreContainer = containerLimit(async (name) => {
 
   return true;
 });
+
+// Start pulling the volume operations image if we plan to work on volumes
+if (operateOnVolumes) {
+  volumeImagePromise = pullImage(volumeOperationsImage);
+}
 
 // Exports
 module.exports = {
