@@ -1,3 +1,4 @@
+require('./modules/globalErrorHandlers');
 const { operation, containers: containerNames } = require('./modules/options');
 const { getContainers, restoreContainer, backupContainer } = require('./modules/docker');
 const { getInspectFilesSync, asyncTryLog } = require('./modules/utils');
