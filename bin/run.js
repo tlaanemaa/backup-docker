@@ -15,5 +15,5 @@ process.on('unhandledRejection', logAndExit);
   await require('..')();
 
   // Safeguard against hanging application
-  process.exit(0);
+  process.exit();
 })();
