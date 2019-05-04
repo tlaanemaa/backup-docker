@@ -39,6 +39,17 @@ const saveInspect = (inspect) => {
 const getVolumeFilesSync = () => getFilesSync(folderStructure.volumes, '.tar')
   .map(file => path.basename(file, path.extname(file)));
 
+// Helper to catch errors, log and then return them
+const logAndReturnErrors = func => async (...args) => {
+  try {
+    return await func(...args);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e.message);
+    return e;
+  }
+};
+
 // Exports
 module.exports = {
   formatContainerName,
@@ -46,4 +57,5 @@ module.exports = {
   loadInspect,
   saveInspect,
   getVolumeFilesSync,
+  logAndReturnErrors,
 };
