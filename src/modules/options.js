@@ -35,7 +35,7 @@ program
 program
   .command('*', { noHelp: true })
   .action((command) => {
-    throw new Error(`Unknown operation: ${command}`, '\nUse --help to see all options');
+    throw new Error(`Unknown operation: ${command}\nUse --help to see all options`);
   });
 
 // Parse args
