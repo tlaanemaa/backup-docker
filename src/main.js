@@ -1,26 +1,46 @@
 const { operation, containers: containerNames } = require('./modules/options');
 const { getContainers, restoreContainer, backupContainer } = require('./modules/docker');
-const { getInspectFilesSync, asyncTryLog } = require('./modules/utils');
+const { getInspectFilesSync } = require('./modules/utils');
 
 // Main backup function
 const backup = async () => {
+  // Get all container names if needed
   const containers = containerNames.length
     ? containerNames
     : () => getContainers();
 
+  // Backup containers
   return Promise.all(containers.map(
-    container => asyncTryLog(() => backupContainer(container)),
+    async (container) => {
+      try {
+        return await backupContainer(container);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e.message);
+        return e;
+      }
+    },
   ));
 };
 
 // Main restore function
 const restore = async () => {
+  // Get all container names if needed
   const containers = containerNames.length
     ? containerNames
     : getInspectFilesSync();
 
+  // Restore containers
   return Promise.all(containers.map(
-    container => asyncTryLog(() => restoreContainer(container)),
+    async (container) => {
+      try {
+        return await restoreContainer(container);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e.message);
+        return e;
+      }
+    },
   ));
 };
 
