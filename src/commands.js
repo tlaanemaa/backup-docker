@@ -7,7 +7,7 @@ const backup = async () => {
   // Get all container names if needed
   const containers = containerNames.length
     ? containerNames
-    : getContainers();
+    : await getContainers();
 
   // Backup containers
   return Promise.all(containers.map(
