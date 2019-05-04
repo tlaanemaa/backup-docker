@@ -96,11 +96,11 @@ const backupVolume = volumeLimit((containerName, volumeName, mountPoint) => dock
 
 // Back up single container by id
 const backupContainer = containerLimit(async (id) => {
-  // eslint-disable-next-line no-console
-  console.log(`== Backing up container: ${id} ==`);
-
   // Wait for the volume operations image to be downloaded before proceeding
   await volumeImagePromise;
+
+  // eslint-disable-next-line no-console
+  console.log(`== Backing up container: ${id} ==`);
 
   const container = docker.getContainer(id);
   const inspect = await container.inspect();
@@ -161,12 +161,11 @@ const restoreVolume = volumeLimit((containerName, tarName, mountPoint) => docker
 
 // Restore (create) container by id
 const restoreContainer = containerLimit(async (name) => {
-  // eslint-disable-next-line no-console
-  console.log(`== Restoring container: ${name} ==`);
-
   // Wait for the volume operations image to be downloaded before proceeding
   await volumeImagePromise;
 
+  // eslint-disable-next-line no-console
+  console.log(`== Restoring container: ${name} ==`);
   const backupInspect = await loadInspect(name);
 
   // Restore container
