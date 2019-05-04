@@ -12,15 +12,8 @@ const formatContainerName = name => name.replace(/^\//g, '');
 
 // Get contents of a folder synchronously
 const getFilesSync = (folder, extension) => {
-  try {
-    const files = fs.readdirSync(folder);
-    return files.filter(file => path.extname(file) === extension);
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error(e.message);
-    process.exit(1);
-    throw e;
-  }
+  const files = fs.readdirSync(folder);
+  return files.filter(file => path.extname(file) === extension);
 };
 
 // Get all container inspect backups synchronously
@@ -47,15 +40,12 @@ const getVolumeFilesSync = () => getFilesSync(folderStructure.volumes, '.tar')
   .map(file => path.basename(file, path.extname(file)));
 
 // Helper to catch and log errors on async functions
-const asyncTryLog = async (func, exit = false) => {
+const asyncTryLog = async (func) => {
   try {
     return await func();
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e.message);
-    if (exit) {
-      process.exit(1);
-    }
     return e;
   }
 };

@@ -7,7 +7,7 @@ const { getInspectFilesSync, asyncTryLog } = require('./modules/utils');
 const backup = async () => {
   const containers = containerNames.length
     ? containerNames
-    : await asyncTryLog(() => getContainers(), true);
+    : () => getContainers();
 
   return Promise.all(containers.map(
     container => asyncTryLog(() => backupContainer(container)),
@@ -35,13 +35,13 @@ module.exports = async () => {
   // Check if we had any errors and log them again if there are
   const errors = results.filter(result => result instanceof Error);
   if (errors.length) {
-    // eslint-disable-next-line no-console
-    console.error('\nThe following errors occurred during the run (this does not include errors from the tar command used for volume backup/restore):');
-    // eslint-disable-next-line no-console
-    errors.map(err => console.error(err.message));
-    process.exit(1);
+    throw new Error([
+      '\nThe following errors occurred during the run (this does not include errors from the tar command used for volume backup/restore):',
+      errors.map(e => e.message).join('\n'),
+    ].join('\n'));
   }
 
+  // Safeguard against hanging application
   process.exit(0);
   return results;
 };
