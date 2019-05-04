@@ -38,6 +38,17 @@ const getContainers = async (all = true) => {
   return containers.map(container => container.Id);
 };
 
+// Helper to check if an image exists locally
+const imageExists = async (name) => {
+  try {
+    const image = docker.getImage(name);
+    await image.inspect();
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
 // Helper to pull an image and log
 const pullImage = (name) => {
   // eslint-disable-next-line no-console
@@ -152,7 +163,10 @@ const restoreContainer = containerLimit(async (name) => {
   // Restore container
   let container = null;
   if (operateOnContainers) {
-    await pullImage(backupInspect.Config.Image);
+    // Pull the image if it doesn't exist
+    if (!await imageExists(backupInspect.Config.Image)) {
+      await pullImage(backupInspect.Config.Image);
+    }
 
     // eslint-disable-next-line no-console
     console.log('Creating container...');
@@ -209,7 +223,11 @@ const restoreContainer = containerLimit(async (name) => {
 
 // Start pulling the volume operations image if we plan to work on volumes
 if (operateOnVolumes) {
-  volumeImagePromise = pullImage(volumeOperationsImage);
+  volumeImagePromise = imageExists(volumeOperationsImage)
+    .then((exists) => {
+      if (exists) return null;
+      return pullImage(volumeOperationsImage);
+    });
 }
 
 // Exports
