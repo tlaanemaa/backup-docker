@@ -35,9 +35,7 @@ program
 program
   .command('*', { noHelp: true })
   .action((command) => {
-    // eslint-disable-next-line no-console
-    console.error(`Unknown operation: ${command}`, '\nUse --help to see all options');
-    process.exit(1);
+    throw new Error(`Unknown operation: ${command}\nUse --help to see all options`);
   });
 
 // Parse args
@@ -45,8 +43,7 @@ program.parse(process.argv);
 
 // Show help if no operation is provided
 if (!commandArgs.operation) {
-  program.outputHelp();
-  process.exit(1);
+  program.help();
 }
 
 module.exports = { ...commandArgs, ...program.opts() };

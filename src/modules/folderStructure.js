@@ -4,14 +4,8 @@ const { directory } = require('./options');
 
 // Ensure folder existence
 const ensureFolderExistsSync = (dir) => {
-  try {
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir);
-    }
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error(e.message);
-    process.exit(1);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
   }
 };
 
