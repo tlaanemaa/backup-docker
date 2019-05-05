@@ -43,7 +43,14 @@ Docker.mockContainer = {
   wait: () => Promise.resolve(),
 };
 
+Docker.mockImage = {
+  inspect: () => {
+    throw new Error('Image does not exist');
+  },
+};
+
 Docker.prototype.getContainer = () => Docker.mockContainer;
+Docker.prototype.getImage = () => Docker.mockImage;
 Docker.prototype.run = jest.fn().mockResolvedValue();
 Docker.prototype.createContainer = jest.fn().mockResolvedValue(Docker.mockContainer);
 Docker.prototype.pull = jest.fn().mockImplementation((name, callback) => {
