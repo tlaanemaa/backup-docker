@@ -114,6 +114,7 @@ describe('restoreContainer', () => {
       NetworkingConfig: {
         EndpointsConfig: {},
       },
+      Image: 'mock/image',
       Volumes: {
         dest1: {},
         dest2: {},
@@ -200,5 +201,70 @@ describe('restoreContainer', () => {
 
     expect(dockerode.prototype.run).toHaveBeenCalledTimes(0);
     expect(dockerode.mockContainer.stop).toHaveBeenCalledTimes(0);
+  });
+
+  it('should throw error if pull fails', async () => {
+    expect.assertions(1);
+    const mockError = new Error('Panic!');
+    const dockerode = require('dockerode');
+    dockerode.prototype.pull = jest.fn().mockImplementation((_, callback) => callback(mockError));
+    const docker = require('../../src/modules/docker');
+
+    try {
+      await docker.restoreContainer('orange');
+    } catch (e) {
+      expect(e).toBe(mockError);
+    }
+  });
+
+  it('should throw error if pull onFinished callback fails', async () => {
+    expect.assertions(1);
+    const mockError = new Error('Panic!');
+    const dockerode = require('dockerode');
+    dockerode.mockOnFinishedArgs = [mockError];
+    const docker = require('../../src/modules/docker');
+
+    try {
+      await docker.restoreContainer('orange');
+    } catch (e) {
+      expect(e).toBe(mockError);
+    }
+  });
+});
+
+describe('pullImage', () => {
+  it('should not add tag if one is present', () => {
+    const dockerode = require('dockerode');
+    dockerode.prototype.pull = jest.fn();
+    const docker = require('../../src/modules/docker');
+
+    docker.pullImage('mock/image:10');
+
+    expect(dockerode.prototype.pull).toHaveBeenCalledWith('mock/image:10', expect.any(Function));
+  });
+
+  it('should not add progress if there isn\'t any', async () => {
+    const dockerode = require('dockerode');
+    dockerode.mockOnProgressArgs = [{ status: 'Pulling bananas' }];
+    global.console.log = jest.fn();
+    const docker = require('../../src/modules/docker');
+
+    await docker.pullImage('banana');
+
+    expect(global.console.log).toHaveBeenCalledWith('Pulling bananas');
+  });
+});
+
+describe('ensureImageExists', () => {
+  it('should not pull if the image already exists', async () => {
+    const dockerode = require('dockerode');
+    dockerode.mockImage.inspect = () => 'mockImageInspect';
+    const docker = require('../../src/modules/docker');
+    docker.pullImage = jest.fn();
+
+    const result = await docker.ensureImageExists('banana');
+
+    expect(result).toEqual(undefined);
+    expect(docker.pullImage).toHaveBeenCalledTimes(0);
   });
 });

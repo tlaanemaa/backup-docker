@@ -1,4 +1,5 @@
 const Docker = require('dockerode');
+const { parseRepositoryTag } = require('dockerode/lib/util');
 const createLimiter = require('limit-async');
 const { socketPath, onlyContainers, onlyVolumes } = require('./options');
 const folderStructure = require('./folderStructure');
@@ -8,6 +9,7 @@ const {
   saveInspect,
   loadInspect,
   getVolumeFilesSync,
+  round,
 } = require('./utils');
 
 // Name of the image we will use for volume operations
@@ -28,12 +30,72 @@ const operateOnContainers = onlyContainers || (!onlyContainers && !onlyVolumes);
 const operateOnVolumes = onlyVolumes || (!onlyVolumes && !onlyContainers);
 
 // If we know that we will operate on volumes, get all volume files in advance
+// Also initialize a variable for pulling the volume operations image if needed
 const volumeFiles = operateOnVolumes ? getVolumeFilesSync() : [];
+let volumeImagePromise = Promise.resolve();
 
 // Get all containers
 const getContainers = async (all = true) => {
   const containers = await docker.listContainers({ all });
   return containers.map(container => container.Id);
+};
+
+// Helper to check if an image exists locally
+const imageExists = async (name) => {
+  try {
+    const image = docker.getImage(name);
+    await image.inspect();
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
+// Helper to pull an image and log
+const pullImage = name => new Promise((resolve, reject) => {
+  // TODO: Remove this once dockerode supports default tags
+  const imageName = parseRepositoryTag(name).tag ? name : `${name}:latest`;
+  // eslint-disable-next-line no-console
+  console.log(`Pulling image: ${imageName}`);
+  docker.pull(
+    imageName,
+    (err, stream) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      const onProgress = (event) => {
+        let progress = '';
+        if (
+          event.progressDetail
+          && event.progressDetail.current
+          && event.progressDetail.total
+        ) {
+          progress = ` (${round(event.progressDetail.current / event.progressDetail.total * 100, 2)}%)`;
+        }
+
+        // eslint-disable-next-line no-console
+        console.log(event.status + progress);
+      };
+
+      const onFinished = (finalErr, finalStream) => {
+        if (finalErr) {
+          reject(finalErr);
+          return;
+        }
+
+        resolve(finalStream);
+      };
+      docker.modem.followProgress(stream, onFinished, onProgress);
+    },
+  );
+});
+
+// Helper to only pull if it doesn't exist
+const ensureImageExists = async (name) => {
+  const exists = await imageExists(name);
+  if (!exists) await pullImage(name);
 };
 
 // Helper to start container and log
@@ -67,8 +129,12 @@ const backupVolume = volumeLimit((containerName, volumeName, mountPoint) => dock
 
 // Back up single container by id
 const backupContainer = containerLimit(async (id) => {
+  // Wait for the volume operations image to be downloaded before proceeding
+  await volumeImagePromise;
+
   // eslint-disable-next-line no-console
   console.log(`== Backing up container: ${id} ==`);
+
   const container = docker.getContainer(id);
   const inspect = await container.inspect();
   const name = formatContainerName(inspect.Name);
@@ -128,6 +194,9 @@ const restoreVolume = volumeLimit((containerName, tarName, mountPoint) => docker
 
 // Restore (create) container by id
 const restoreContainer = containerLimit(async (name) => {
+  // Wait for the volume operations image to be downloaded before proceeding
+  await volumeImagePromise;
+
   // eslint-disable-next-line no-console
   console.log(`== Restoring container: ${name} ==`);
   const backupInspect = await loadInspect(name);
@@ -135,6 +204,9 @@ const restoreContainer = containerLimit(async (name) => {
   // Restore container
   let container = null;
   if (operateOnContainers) {
+    // Pull the image if it doesn't exist
+    await ensureImageExists(backupInspect.Config.Image);
+
     // eslint-disable-next-line no-console
     console.log('Creating container...');
     container = await docker.createContainer(inspect2Config(backupInspect));
@@ -188,9 +260,16 @@ const restoreContainer = containerLimit(async (name) => {
   return true;
 });
 
+// Start pulling the volume operations image if we plan to work on volumes
+if (operateOnVolumes) {
+  volumeImagePromise = ensureImageExists(volumeOperationsImage);
+}
+
 // Exports
 module.exports = {
   getContainers,
   backupContainer,
   restoreContainer,
+  pullImage,
+  ensureImageExists,
 };
