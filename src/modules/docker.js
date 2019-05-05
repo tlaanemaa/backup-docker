@@ -273,4 +273,5 @@ module.exports = {
   getContainers,
   backupContainer,
   restoreContainer,
+  pullImage,
 };
