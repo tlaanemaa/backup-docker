@@ -72,7 +72,7 @@ const pullImage = name => new Promise((resolve, reject) => {
           && event.progressDetail.current
           && event.progressDetail.total
         ) {
-          progress = ` (${round(event.progressDetail.current / event.progressDetail.total * 100, 2)})%`;
+          progress = ` (${round(event.progressDetail.current / event.progressDetail.total * 100, 2)}%)`;
         }
 
         // eslint-disable-next-line no-console
