@@ -60,6 +60,11 @@ const pullImage = name => new Promise((resolve, reject) => {
   docker.pull(
     imageName,
     (err, stream) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
       const onProgress = (event) => {
         let progress = '';
         if (
