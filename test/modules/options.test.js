@@ -24,7 +24,7 @@ describe('options', () => {
     global.process.argv = ['node', 'dummy.js', 'dance', 'mango'];
 
     expect(() => require('../../src/modules/options'))
-      .toThrow('Unknown operation: dance\nUse --help to see all options');
+      .toThrow('Unknown command: dance\nUse --help to see usage information');
   });
 
   it('should show help if operation is omitted', () => {
