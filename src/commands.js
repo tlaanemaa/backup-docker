@@ -11,7 +11,10 @@ const backup = async () => {
 
   // Backup containers
   return Promise.all(containers.map(
-    logAndReturnErrors(backupContainer),
+    async container => ({
+      name: container,
+      result: await logAndReturnErrors(backupContainer)(container),
+    }),
   ));
 };
 
@@ -24,7 +27,10 @@ const restore = async () => {
 
   // Restore containers
   return Promise.all(containers.map(
-    logAndReturnErrors(restoreContainer),
+    async container => ({
+      name: container,
+      result: await logAndReturnErrors(restoreContainer)(container),
+    }),
   ));
 };
 
