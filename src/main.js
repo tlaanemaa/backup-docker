@@ -10,7 +10,7 @@ module.exports = async () => {
   // Print a summary of the results if there are any
   if (results.length) {
     // eslint-disable-next-line no-console
-    console.log('\nSummary:');
+    console.log('\nSummary (does not include errors from tar command used for volume operations):');
     results.forEach(({ name, result }) => {
       const success = !(result instanceof Error);
       const mark = success ? '✔' : '✖';
