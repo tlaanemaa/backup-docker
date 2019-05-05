@@ -54,6 +54,7 @@ const imageExists = async (name) => {
 // Helper to pull an image and log
 const pullImage = name => new Promise((resolve, reject) => {
   // TODO: Remove this once dockerode supports default tags
+  // https://github.com/apocas/dockerode/pull/518
   const imageName = parseRepositoryTag(name).tag ? name : `${name}:latest`;
   // eslint-disable-next-line no-console
   console.log(`Pulling image: ${imageName}`);
@@ -87,6 +88,7 @@ const pullImage = name => new Promise((resolve, reject) => {
 
         resolve(finalStream);
       };
+
       docker.modem.followProgress(stream, onFinished, onProgress);
     },
   );
