@@ -114,6 +114,7 @@ describe('restoreContainer', () => {
       NetworkingConfig: {
         EndpointsConfig: {},
       },
+      Image: 'mock/image',
       Volumes: {
         dest1: {},
         dest2: {},

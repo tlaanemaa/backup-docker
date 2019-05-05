@@ -18,7 +18,9 @@ const mockInspectFile = `
       "Type": "volume"
     }
   ],
-  "Config": {},
+  "Config": {
+    "Image": "mock/image"
+  },
   "HostConfig": {
     "NetworkMode": "mockMode"
   },
