@@ -7,12 +7,17 @@ module.exports = async () => {
   // eslint-disable-next-line no-console
   console.log('== Done ==');
 
-  // Check if we had any errors and throw them if we did
-  const errors = results.filter(result => result instanceof Error);
-  if (errors.length) {
-    const errorHeader = '\nThe following errors occurred during the run (this does not include errors from the tar command used for volume backup/restore):\n';
-    const errorMessages = errors.map(e => e.message).join('\n');
-    throw new Error(errorHeader + errorMessages);
+  // Print a summary of the results if there are any
+  if (results.length) {
+    // eslint-disable-next-line no-console
+    console.log('\nSummary:');
+    results.forEach(({ name, result }) => {
+      const success = !(result instanceof Error);
+      const mark = success ? '✔' : '✖';
+      const message = success ? 'Success!' : result.message;
+      // eslint-disable-next-line no-console
+      console.log(`  ${mark} ${name}: ${message}`);
+    });
   }
 
   return results;
