@@ -95,10 +95,7 @@ const pullImage = name => new Promise((resolve, reject) => {
 // Helper to only pull if it doesn't exist
 const ensureImageExists = async (name) => {
   const exists = await imageExists(name);
-  if (!exists) {
-    return pullImage(name);
-  }
-  return null;
+  if (!exists) await pullImage(name);
 };
 
 // Helper to start container and log

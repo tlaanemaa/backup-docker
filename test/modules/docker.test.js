@@ -264,7 +264,7 @@ describe('ensureImageExists', () => {
 
     const result = await docker.ensureImageExists('banana');
 
-    expect(result).toEqual(null);
+    expect(result).toEqual(undefined);
     expect(docker.pullImage).toHaveBeenCalledTimes(0);
   });
 });
