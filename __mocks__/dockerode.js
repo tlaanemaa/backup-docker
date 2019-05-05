@@ -6,8 +6,8 @@ class Docker extends Dockerode {
     super(...args);
     this.modem = {
       followProgress: (_, onFinished, onProgress) => {
-        onProgress({ status: 'banana', progressDetail: { current: 5, total: 100 } });
-        onFinished(null, 'orange');
+        onProgress(...Docker.mockOnProgressArgs);
+        onFinished(...Docker.mockOnFinishedArgs);
       },
     };
   }
@@ -18,6 +18,9 @@ Docker.prototype.listContainers = () => Promise.resolve([
   { Id: 2 },
   { Id: 3 },
 ]);
+
+Docker.mockOnFinishedArgs = [null, 'orange'];
+Docker.mockOnProgressArgs = [{ status: 'banana', progressDetail: { current: 5, total: 100 } }];
 
 Docker.mockInspection = {
   Name: 'banana',
