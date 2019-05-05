@@ -1,4 +1,5 @@
 const Docker = require('dockerode');
+const { parseRepositoryTag } = require('dockerode/lib/util');
 const createLimiter = require('limit-async');
 const { socketPath, onlyContainers, onlyVolumes } = require('./options');
 const folderStructure = require('./folderStructure');
@@ -8,6 +9,7 @@ const {
   saveInspect,
   loadInspect,
   getVolumeFilesSync,
+  round,
 } = require('./utils');
 
 // Name of the image we will use for volume operations
@@ -50,11 +52,40 @@ const imageExists = async (name) => {
 };
 
 // Helper to pull an image and log
-const pullImage = (name) => {
+const pullImage = name => new Promise((resolve, reject) => {
+  // TODO: Remove this once dockerode supports default tags
+  const imageName = parseRepositoryTag(name).tag ? name : `${name}:latest`;
   // eslint-disable-next-line no-console
-  console.log(`Pulling image: ${name}`);
-  return docker.pull(name);
-};
+  console.log(`Pulling image: ${imageName}`);
+  docker.pull(
+    imageName,
+    (err, stream) => {
+      const onProgress = (event) => {
+        let progress = '';
+        if (
+          event.progressDetail
+          && event.progressDetail.current
+          && event.progressDetail.total
+        ) {
+          progress = ` (${round(event.progressDetail.current / event.progressDetail.total * 100, 2)})%`;
+        }
+
+        // eslint-disable-next-line no-console
+        console.log(event.status + progress);
+      };
+
+      const onFinished = (finalErr, finalStream) => {
+        if (finalErr) {
+          reject(finalErr);
+          return;
+        }
+
+        resolve(finalStream);
+      };
+      docker.modem.followProgress(stream, onFinished, onProgress);
+    },
+  );
+});
 
 // Helper to only pull if it doesn't exist
 const ensureImageExists = async (name) => {
