@@ -50,6 +50,12 @@ const logAndReturnErrors = func => async (...args) => {
   }
 };
 
+// Rounding function
+const round = (num, decimalPoints = 0) => {
+  const multiplier = 10 ** decimalPoints;
+  return Math.round(num * multiplier) / multiplier;
+};
+
 // Exports
 module.exports = {
   formatContainerName,
@@ -58,4 +64,5 @@ module.exports = {
   saveInspect,
   getVolumeFilesSync,
   logAndReturnErrors,
+  round,
 };
