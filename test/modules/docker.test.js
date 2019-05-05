@@ -254,3 +254,17 @@ describe('pullImage', () => {
     expect(global.console.log).toHaveBeenCalledWith('Pulling bananas');
   });
 });
+
+describe('ensureImageExists', () => {
+  it('should not pull if the image already exists', async () => {
+    const dockerode = require('dockerode');
+    dockerode.mockImage.inspect = () => 'mockImageInspect';
+    const docker = require('../../src/modules/docker');
+    docker.pullImage = jest.fn();
+
+    const result = await docker.ensureImageExists('banana');
+
+    expect(result).toEqual(null);
+    expect(docker.pullImage).toHaveBeenCalledTimes(0);
+  });
+});
