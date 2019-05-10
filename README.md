@@ -25,8 +25,8 @@ _When run with `restore` command, backup-docker will expect these folders to exi
 - `backup-docker restore` - Will restore all containers in containers folder, and their volumes
 - `backup-docker backup banana` - Will backup only the container named "banana" and all of it's volumes
 - `backup-docker restore banana mango` - Will restore only the containers named "banana" and "mango" and all of their volumes
-- `backup-docker restore banana --only=containers` - Will restore only the container named "banana" and not it's volumes
-- `backup-docker restore banana --only=volumes` - Will restore the volumes attached to the container named "banana" but not the container itself. The container itself must already exist in the docker instance
+- `backup-docker restore banana --only-containers` - Will restore only the container named "banana" and not it's volumes
+- `backup-docker restore banana --only-volumes` - Will restore the volumes attached to the container named "banana" but not the container itself. The container itself must already exist in the docker instance
 
 ## All options
 - `-v, --version` - output the version number
