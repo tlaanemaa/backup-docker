@@ -1,6 +1,6 @@
 const { containers: containerNames } = require('./modules/options');
 const { getContainers, restoreContainer, backupContainer } = require('./modules/docker');
-const { getInspectFilesSync, logAndReturnErrors } = require('./modules/utils');
+const { getContanerInspectFilesSync, logAndReturnErrors } = require('./modules/utils');
 
 // Main backup function
 const backup = async () => {
@@ -23,7 +23,7 @@ const restore = async () => {
   // Get all container names if needed
   const containers = containerNames.length
     ? containerNames
-    : getInspectFilesSync();
+    : getContanerInspectFilesSync();
 
   // Restore containers
   return Promise.all(containers.map(

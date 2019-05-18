@@ -16,24 +16,36 @@ const getFilesSync = (folder, extension) => {
   return files.filter(file => path.extname(file) === extension);
 };
 
-// Get all container inspect backups synchronously
-const getInspectFilesSync = () => getFilesSync(folderStructure.containers, '.json')
+// Get all inspect backups synchronously
+const getInspectFilesSync = dir => getFilesSync(dir, '.json')
   .map(file => path.basename(file, path.extname(file)));
 
-// Load container inspects
-const loadInspect = async (name) => {
-  const filePath = path.resolve(folderStructure.containers, `${name}.json`);
+// Specific helpers for containers and volumes
+const getContainerInspectFilesSync = () => getInspectFilesSync(folderStructure.containers);
+const getVolumeInspectFilesSync = () => getInspectFilesSync(folderStructure.volumes);
+
+// Load inspects
+const loadInspect = async (name, dir) => {
+  const filePath = path.resolve(dir, `${name}.json`);
   const inspect = await readFile(filePath);
   return JSON.parse(inspect);
 };
 
-// Write container inspects
-const saveInspect = (inspect) => {
+// Specific helpers for containers and volumes
+const loadContainerInspect = inspect => loadInspect(inspect, folderStructure.containers);
+const loadVolumeInspect = inspect => loadInspect(inspect, folderStructure.volumes);
+
+// Write inspects
+const saveInspect = (inspect, dir) => {
   const name = inspect.Name.replace(/^\//g, '');
-  const filePath = path.resolve(folderStructure.containers, `${name}.json`);
+  const filePath = path.resolve(dir, `${name}.json`);
   const inspectString = JSON.stringify(inspect, null, 2);
   return writeFile(filePath, inspectString);
 };
+
+// Specific helpers for containers and volumes
+const saveContainerInspect = inspect => saveInspect(inspect, folderStructure.containers);
+const saveVolumeInspect = inspect => saveInspect(inspect, folderStructure.volumes);
 
 // Get all volume backups synchronously
 const getVolumeFilesSync = () => getFilesSync(folderStructure.volumes, '.tar')
@@ -59,9 +71,12 @@ const round = (num, decimalPoints = 0) => {
 // Exports
 module.exports = {
   formatContainerName,
-  getInspectFilesSync,
-  loadInspect,
-  saveInspect,
+  getContainerInspectFilesSync,
+  getVolumeInspectFilesSync,
+  loadContainerInspect,
+  loadVolumeInspect,
+  saveContainerInspect,
+  saveVolumeInspect,
   getVolumeFilesSync,
   logAndReturnErrors,
   round,

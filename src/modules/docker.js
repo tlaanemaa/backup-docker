@@ -6,8 +6,8 @@ const folderStructure = require('./folderStructure');
 const inspect2Config = require('./inspect2config');
 const {
   formatContainerName,
-  saveInspect,
-  loadInspect,
+  saveContainerInspect,
+  loadContainerInspect,
   getVolumeFilesSync,
   round,
 } = require('./utils');
@@ -116,6 +116,11 @@ const stopContainer = async (container) => {
 };
 
 // Backup volume as a tar file
+// const backupVolume = volumeLimit(async (name) => {
+//   const volume = docker.getVolume(name);
+//   const volumeInspect = await volume.inspect();
+// });
+
 const backupVolume = volumeLimit((containerName, volumeName, mountPoint) => docker.run(
   volumeOperationsImage,
   ['tar', 'cvf', `${dockerBackupMountDir}/${volumeName}.tar`, mountPoint],
@@ -174,7 +179,7 @@ const backupContainer = containerLimit(async (id) => {
   if (operateOnContainers) {
     // eslint-disable-next-line no-console
     console.log('Saving container inspect...');
-    await saveInspect(inspect);
+    await saveContainerInspect(inspect);
   }
 
   return true;
@@ -201,7 +206,7 @@ const restoreContainer = containerLimit(async (name) => {
 
   // eslint-disable-next-line no-console
   console.log(`== Restoring container: ${name} ==`);
-  const backupInspect = await loadInspect(name);
+  const backupInspect = await loadContainerInspect(name);
 
   // Restore container
   let container = null;
