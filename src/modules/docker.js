@@ -5,8 +5,8 @@ const { socketPath, onlyContainers, onlyVolumes } = require('./options');
 const folderStructure = require('./folderStructure');
 const inspect2Config = require('./inspect2config');
 const {
-  formatContainerName,
   saveContainerInspect,
+  saveVolumeInspect,
   loadContainerInspect,
   getVolumeFilesSync,
   round,
@@ -17,6 +17,9 @@ const volumeOperationsImage = 'ubuntu';
 
 // Volume backup directory mount path inside the container.
 const dockerBackupMountDir = '/__volume_backup_mount__';
+
+// Volume mount directory inside the container when backing it up
+const dockerBackupVolumeDir = '/__volume__';
 
 // Create docker instance using the provided socket path if available
 const docker = socketPath ? new Docker({ socketPath }) : new Docker();
@@ -116,23 +119,31 @@ const stopContainer = async (container) => {
 };
 
 // Backup volume as a tar file
-// const backupVolume = volumeLimit(async (name) => {
-//   const volume = docker.getVolume(name);
-//   const volumeInspect = await volume.inspect();
-// });
+const backupVolume = volumeLimit(async (name) => {
+  const volume = docker.getVolume(name);
+  const inspect = await volume.inspect();
 
-const backupVolume = volumeLimit((containerName, volumeName, mountPoint) => docker.run(
-  volumeOperationsImage,
-  ['tar', 'cvf', `${dockerBackupMountDir}/${volumeName}.tar`, mountPoint],
-  process.stdout,
-  {
-    HostConfig: {
-      AutoRemove: true,
-      Binds: [`${folderStructure.volumes}:${dockerBackupMountDir}`],
-      VolumesFrom: [containerName],
+  // eslint-disable-next-line no-console
+  console.log(`Saving volume inspect for ${name}...`);
+  await saveVolumeInspect(inspect);
+
+  // eslint-disable-next-line no-console
+  console.log(`Starting volume backup for ${name}...`);
+  return docker.run(
+    volumeOperationsImage,
+    ['tar', 'cvf', `${dockerBackupMountDir}/${name}.tar`, dockerBackupVolumeDir],
+    process.stdout,
+    {
+      HostConfig: {
+        AutoRemove: true,
+        Binds: [
+          `${folderStructure.volumes}:${dockerBackupMountDir}`,
+          `${name}:${dockerBackupVolumeDir}`,
+        ],
+      },
     },
-  },
-));
+  );
+});
 
 // Back up single container by id
 const backupContainer = containerLimit(async (id) => {
@@ -144,7 +155,6 @@ const backupContainer = containerLimit(async (id) => {
 
   const container = docker.getContainer(id);
   const inspect = await container.inspect();
-  const name = formatContainerName(inspect.Name);
   const isRunning = inspect.State.Running;
 
   // Backup volumes
@@ -162,10 +172,8 @@ const backupContainer = containerLimit(async (id) => {
       }
 
       // Go over the container's volumes and back them up
-      // eslint-disable-next-line no-console
-      console.log('Starting volume backup...');
       await Promise.all(
-        volumes.map(volume => backupVolume(name, volume.Name, volume.Destination)),
+        volumes.map(volume => backupVolume(volume.Name)),
       );
 
       // Start container if it was running

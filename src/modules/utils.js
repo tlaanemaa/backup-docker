@@ -8,7 +8,7 @@ const writeFile = promisify(fs.writeFile);
 const readFile = promisify(fs.readFile);
 
 // Format container names
-const formatContainerName = name => name.replace(/^\//g, '');
+const formatName = name => name.replace(/^\//g, '');
 
 // Get contents of a folder synchronously
 const getFilesSync = (folder, extension) => {
@@ -37,7 +37,7 @@ const loadVolumeInspect = inspect => loadInspect(inspect, folderStructure.volume
 
 // Write inspects
 const saveInspect = (inspect, dir) => {
-  const name = inspect.Name.replace(/^\//g, '');
+  const name = formatName(inspect.Name);
   const filePath = path.resolve(dir, `${name}.json`);
   const inspectString = JSON.stringify(inspect, null, 2);
   return writeFile(filePath, inspectString);
@@ -70,7 +70,7 @@ const round = (num, decimalPoints = 0) => {
 
 // Exports
 module.exports = {
-  formatContainerName,
+  formatName,
   getContainerInspectFilesSync,
   getVolumeInspectFilesSync,
   loadContainerInspect,

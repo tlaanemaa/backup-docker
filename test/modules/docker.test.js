@@ -23,7 +23,7 @@ describe('backupContainer', () => {
 
     await docker.backupContainer(3);
 
-    expect(fs.writeFile).toHaveBeenCalledTimes(1);
+    expect(fs.writeFile).toHaveBeenCalledTimes(3);
     expect(fs.writeFile).toHaveBeenCalledWith(
       '/folder/containers/banana.json',
       JSON.stringify(dockerode.mockInspection, null, 2),
@@ -44,19 +44,21 @@ describe('backupContainer', () => {
     expect(dockerode.prototype.run).toHaveBeenCalledTimes(2);
     expect(dockerode.prototype.run).toHaveBeenLastCalledWith(
       'ubuntu',
-      ['tar', 'cvf', '/__volume_backup_mount__/mount2.tar', 'dest2'],
+      ['tar', 'cvf', '/__volume_backup_mount__/mount2.tar', '/__volume__'],
       expect.any(Object),
       {
         HostConfig: {
           AutoRemove: true,
-          Binds: ['/folder/volumes:/__volume_backup_mount__'],
-          VolumesFrom: ['banana'],
+          Binds: [
+            '/folder/volumes:/__volume_backup_mount__',
+            'mount2:/__volume__',
+          ],
         },
       },
     );
   });
 
-  it('should only write inspect when only is containers', async () => {
+  it('should only write container inspect when only is containers', async () => {
     const fs = require('fs');
     const dockerode = require('dockerode');
     const options = require('../../src/modules/options');
@@ -69,7 +71,7 @@ describe('backupContainer', () => {
     expect(fs.writeFile).toHaveBeenCalledTimes(1);
   });
 
-  it('should only write volumes when only is volumes', async () => {
+  it('should only write volumes and their inspects when only is volumes', async () => {
     const fs = require('fs');
     const dockerode = require('dockerode');
     const options = require('../../src/modules/options');
@@ -79,7 +81,7 @@ describe('backupContainer', () => {
     await docker.backupContainer(3);
 
     expect(dockerode.prototype.run).toHaveBeenCalledTimes(2);
-    expect(fs.writeFile).toHaveBeenCalledTimes(0);
+    expect(fs.writeFile).toHaveBeenCalledTimes(2);
   });
 
   it('should not stop container when there are no volumes', async () => {
