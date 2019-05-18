@@ -105,24 +105,63 @@ const ensureImageExists = async (name) => {
 };
 
 // Helper to start container and log
-const startContainer = (container) => {
+const startContainer = (id) => {
   // eslint-disable-next-line no-console
   console.log('Starting container...');
+  const container = docker.getContainer(id);
   return container.start();
 };
 
 // Helper to stop container, wait and log
-const stopContainer = async (container) => {
+const stopContainer = async (id) => {
   // eslint-disable-next-line no-console
   console.log('Stopping container...');
+  const container = docker.getContainer(id);
   await container.stop();
   return container.wait();
 };
 
+// Helper to detect volumes
+const isVolume = mount => mount.Name && mount.Type === 'volume';
+
+// Helper to detect NFS volumes
+const isNfsVolume = inspect => inspect.Options && !!inspect.Options.type.match(/nfs/i);
+
+// Helper to detect non-persistent volumes
+const isNonPersistentVolume = inspect => inspect.Labels != null;
+
 // Backup volume as a tar file
-const backupVolume = volumeLimit(async (name) => {
+const volumesAlreadyBackedUp = [];
+const backupVolume = volumeLimit(async (name, containersNotToStart = []) => {
+  // Skip volumes we've already backed up
+  if (volumesAlreadyBackedUp.includes(name)) {
+    return;
+  }
+  volumesAlreadyBackedUp.push(name);
+
   const volume = docker.getVolume(name);
   const inspect = await volume.inspect();
+
+  // Skip volumes we don't want to backup
+  if (
+    isNfsVolume(inspect)
+    || isNonPersistentVolume(inspect)
+  ) {
+    return;
+  }
+
+  // Get containers attached to this volume so we can stop them
+  const containers = await docker.listContainers({
+    filters: [
+      { volume: name },
+      { status: 'running' },
+    ],
+  });
+
+  // Stop these containers so they wouldn't change their data
+  await Promise.all(
+    containers.map(container => stopContainer(container.Id)),
+  );
 
   // eslint-disable-next-line no-console
   console.log(`Saving volume inspect for ${name}...`);
@@ -130,7 +169,7 @@ const backupVolume = volumeLimit(async (name) => {
 
   // eslint-disable-next-line no-console
   console.log(`Starting volume backup for ${name}...`);
-  return docker.run(
+  await docker.run(
     volumeOperationsImage,
     ['tar', 'cvf', `${dockerBackupMountDir}/${name}.tar`, dockerBackupVolumeDir],
     process.stdout,
@@ -144,6 +183,13 @@ const backupVolume = volumeLimit(async (name) => {
       },
     },
   );
+
+  // Start the containers back up
+  await Promise.all(
+    containers
+      .filter(container => !containersNotToStart.includes(container.Id))
+      .map(container => startContainer(container.Id)),
+  );
 });
 
 // Back up single container by id
@@ -156,31 +202,21 @@ const backupContainer = containerLimit(async (id) => {
 
   const container = docker.getContainer(id);
   const inspect = await container.inspect();
-  const isRunning = inspect.State.Running;
+  const wasRunning = inspect.State.Running;
 
   // Backup volumes
   if (operateOnVolumes) {
     // Extract and filter volumes to know if we have anything to backup
-    const volumes = inspect.Mounts
-      .filter(mount => mount.Name && mount.Type === 'volume');
+    const volumes = inspect.Mounts.filter(mount => isVolume(mount));
 
-    // Only go ahead if we actually have any volumes
-    if (volumes.length) {
-      // Stop container, and wait for it to stop, if it's running
-      // so it wouldn't change files while we copy them
-      if (isRunning) {
-        await stopContainer(container);
-      }
+    // Backup volumes
+    await Promise.all(
+      volumes.map(volume => backupVolume(volume.Name, inspect.Id)),
+    );
 
-      // Go over the container's volumes and back them up
-      await Promise.all(
-        volumes.map(volume => backupVolume(volume.Name)),
-      );
-
-      // Start container if it was running
-      if (isRunning) {
-        await startContainer(container);
-      }
+    // Start container if it was running
+    if (wasRunning) {
+      await startContainer(container.Id);
     }
   }
 
@@ -259,7 +295,7 @@ const restoreContainer = containerLimit(async (name) => {
       // Stop container, and wait for it to stop, if it's running
       // so it wouldn't change files while we copy them
       if (isRunning) {
-        await stopContainer(container);
+        await stopContainer(container.Id);
       }
 
       // Go over the container's volumes and restore their contents
@@ -269,7 +305,7 @@ const restoreContainer = containerLimit(async (name) => {
 
       // Start container if it was running
       if (isRunning) {
-        await startContainer(container);
+        await startContainer(container.Id);
       }
     }
   }
@@ -280,7 +316,7 @@ const restoreContainer = containerLimit(async (name) => {
     && backupInspect.State.Running
     && !inspect.State.Running
   ) {
-    await startContainer(container);
+    await startContainer(container.Id);
   }
 
   return true;

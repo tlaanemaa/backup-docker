@@ -39,8 +39,8 @@ describe('backupContainer', () => {
 
     await docker.backupContainer(3);
 
-    expect(dockerode.mockContainer.stop).toHaveBeenCalledTimes(1);
-    expect(dockerode.mockContainer.start).toHaveBeenCalledTimes(1);
+    expect(dockerode.mockContainer.stop).toHaveBeenCalledTimes(6);
+    expect(dockerode.mockContainer.start).toHaveBeenCalledTimes(7);
     expect(dockerode.prototype.run).toHaveBeenCalledTimes(2);
     expect(dockerode.prototype.run).toHaveBeenLastCalledWith(
       'ubuntu',
