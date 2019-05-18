@@ -3,11 +3,12 @@ const { parseRepositoryTag } = require('dockerode/lib/util');
 const createLimiter = require('limit-async');
 const { socketPath, onlyContainers, onlyVolumes } = require('./options');
 const folderStructure = require('./folderStructure');
-const inspect2Config = require('./inspect2config');
+const { containerInspect2Config, volumeInspect2Config } = require('./inspect2config');
 const {
   saveContainerInspect,
   saveVolumeInspect,
   loadContainerInspect,
+  loadVolumeInspect,
   getVolumeFilesSync,
   round,
 } = require('./utils');
@@ -194,18 +195,30 @@ const backupContainer = containerLimit(async (id) => {
 });
 
 // Restore volume contents from a tar archive
-const restoreVolume = volumeLimit((containerName, tarName, mountPoint) => docker.run(
-  volumeOperationsImage,
-  ['tar', 'xvf', `${dockerBackupMountDir}/${tarName}.tar`, '--strip', '1', '--directory', mountPoint],
-  process.stdout,
-  {
-    HostConfig: {
-      AutoRemove: true,
-      Binds: [`${folderStructure.volumes}:${dockerBackupMountDir}`],
-      VolumesFrom: [containerName],
+const restoreVolume = volumeLimit(async (name) => {
+  const inspect = await loadVolumeInspect(name);
+
+  // eslint-disable-next-line no-console
+  console.log(`Creating volume ${inspect.Name}...`);
+  await docker.createVolume(volumeInspect2Config(inspect));
+
+  // eslint-disable-next-line no-console
+  console.log(`Restoring contents of ${inspect.Name}...`);
+  return docker.run(
+    volumeOperationsImage,
+    ['tar', 'xvf', `${dockerBackupMountDir}/${name}.tar`, '--strip', '1', '--directory', dockerBackupVolumeDir],
+    process.stdout,
+    {
+      HostConfig: {
+        AutoRemove: true,
+        Binds: [
+          `${folderStructure.volumes}:${dockerBackupMountDir}`,
+          `${name}:${dockerBackupVolumeDir}`,
+        ],
+      },
     },
-  },
-));
+  );
+});
 
 // Restore (create) container by id
 const restoreContainer = containerLimit(async (name) => {
@@ -224,7 +237,7 @@ const restoreContainer = containerLimit(async (name) => {
 
     // eslint-disable-next-line no-console
     console.log('Creating container...');
-    container = await docker.createContainer(inspect2Config(backupInspect));
+    container = await docker.createContainer(containerInspect2Config(backupInspect));
   } else {
     // eslint-disable-next-line no-console
     console.log('Getting container...');
@@ -250,10 +263,8 @@ const restoreContainer = containerLimit(async (name) => {
       }
 
       // Go over the container's volumes and restore their contents
-      // eslint-disable-next-line no-console
-      console.log('Starting volume restore...');
       await Promise.all(
-        volumes.map(volume => restoreVolume(name, volume.Name, volume.Destination)),
+        volumes.map(volume => restoreVolume(volume.Name)),
       );
 
       // Start container if it was running

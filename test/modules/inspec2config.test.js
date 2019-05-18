@@ -1,8 +1,8 @@
-const inspect2config = require('../../src/modules/inspect2config');
+const { containerInspect2Config } = require('../../src/modules/inspect2config');
 
 describe('inspect2config', () => {
   it('should parse the inspection result into a config', () => {
-    const config = inspect2config({
+    const config = containerInspect2Config({
       Name: '/orange',
       State: {
         Running: true,
@@ -54,7 +54,7 @@ describe('inspect2config', () => {
   });
 
   it('should hostname and exposed ports when NetworkMode is container:', () => {
-    const config = inspect2config({
+    const config = containerInspect2Config({
       Name: '/orange',
       State: {
         Running: true,
@@ -89,7 +89,7 @@ describe('inspect2config', () => {
   });
 
   it('should add :ro to read-only mounts', () => {
-    const config = inspect2config({
+    const config = containerInspect2Config({
       Name: '/orange',
       State: {
         Running: true,
@@ -124,7 +124,7 @@ describe('inspect2config', () => {
   });
 
   it('should use Source if Name is not provided', () => {
-    const config = inspect2config({
+    const config = containerInspect2Config({
       Name: '/orange',
       State: {
         Running: true,
@@ -158,7 +158,7 @@ describe('inspect2config', () => {
   });
 
   it('should ignore mounts without name or source and destination', () => {
-    const config = inspect2config({
+    const config = containerInspect2Config({
       Name: '/orange',
       State: {
         Running: true,

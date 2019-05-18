@@ -139,13 +139,15 @@ describe('restoreContainer', () => {
     expect(dockerode.prototype.run).toHaveBeenCalledTimes(2);
     expect(dockerode.prototype.run).toHaveBeenLastCalledWith(
       'ubuntu',
-      ['tar', 'xvf', '/__volume_backup_mount__/mount2.tar', '--strip', '1', '--directory', 'dest2'],
+      ['tar', 'xvf', '/__volume_backup_mount__/mount2.tar', '--strip', '1', '--directory', '/__volume__'],
       expect.any(Object),
       {
         HostConfig: {
           AutoRemove: true,
-          Binds: ['/folder/volumes:/__volume_backup_mount__'],
-          VolumesFrom: ['orange'],
+          Binds: [
+            '/folder/volumes:/__volume_backup_mount__',
+            'mount2:/__volume__',
+          ],
         },
       },
     );
