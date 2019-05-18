@@ -211,7 +211,7 @@ const backupContainer = containerLimit(async (id) => {
 
     // Backup volumes
     await Promise.all(
-      volumes.map(volume => backupVolume(volume.Name, inspect.Id)),
+      volumes.map(volume => backupVolume(volume.Name, [inspect.Id])),
     );
 
     // Start container if it was running
