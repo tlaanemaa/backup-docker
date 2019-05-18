@@ -1,0 +1,42 @@
+[
+  {
+      "CreatedAt": "2019-05-18T10:52:43Z",
+      "Driver": "local",
+      "Labels": null,
+      "Mountpoint": "/var/snap/docker/common/var-lib-docker/volumes/833de31f0ac0ed387c0b3536200f341cb133392d6569c722aaeb64c3edf6960e/_data",
+      "Name": "833de31f0ac0ed387c0b3536200f341cb133392d6569c722aaeb64c3edf6960e",
+      "Options": null,
+      "Scope": "local"
+  },
+  {
+      "CreatedAt": "2019-05-18T10:58:23Z",
+      "Driver": "local",
+      "Labels": {},
+      "Mountpoint": "/var/snap/docker/common/var-lib-docker/volumes/banana/_data",
+      "Name": "banana",
+      "Options": {},
+      "Scope": "local"
+  },
+  {
+      "CreatedAt": "2019-05-18T10:52:43Z",
+      "Driver": "local",
+      "Labels": null,
+      "Mountpoint": "/var/snap/docker/common/var-lib-docker/volumes/c7f79caf5f40dba0854fa6b8f40518d177dbcfadc11d0fc55ebf664d71a5b09b/_data",
+      "Name": "c7f79caf5f40dba0854fa6b8f40518d177dbcfadc11d0fc55ebf664d71a5b09b",
+      "Options": null,
+      "Scope": "local"
+  },
+  {
+      "CreatedAt": "2019-05-18T10:46:19Z",
+      "Driver": "local",
+      "Labels": {},
+      "Mountpoint": "/var/snap/docker/common/var-lib-docker/volumes/plex-media/_data",
+      "Name": "plex-media",
+      "Options": {
+          "device": ":/volume1/main",
+          "o": "addr=192.168.1.210,rw",
+          "type": "nfs"
+      },
+      "Scope": "local"
+  }
+]
