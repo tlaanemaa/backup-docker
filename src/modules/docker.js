@@ -35,6 +35,16 @@ const getAllContainers = async () => {
   return containers.map(container => container.Id);
 };
 
+// Get running containers
+const getRunningContainers = async () => {
+  const containers = await docker.listContainers({
+    filters: [
+      { status: 'running' },
+    ],
+  });
+  return containers.map(container => container.Id);
+};
+
 // Helper to check if an image exists locally
 const imageExists = async (name) => {
   try {
@@ -101,7 +111,7 @@ const ensureVolumeImageExists = () => ensureImageExists(volumeOperationsImage);
 // Helper to start container and log
 const startContainer = (id) => {
   // eslint-disable-next-line no-console
-  console.log('Starting container...');
+  console.log(`Starting container ${id}...`);
   const container = docker.getContainer(id);
   return container.start();
 };
@@ -109,7 +119,7 @@ const startContainer = (id) => {
 // Helper to stop container, wait and log
 const stopContainer = async (id) => {
   // eslint-disable-next-line no-console
-  console.log('Stopping container...');
+  console.log(`Stopping container ${id}...`);
   const container = docker.getContainer(id);
   await container.stop();
   return container.wait();
@@ -126,11 +136,9 @@ const isNonPersistentVolume = inspect => inspect.Labels != null;
 
 // Backup volume as a tar file
 const volumesAlreadyBackedUp = [];
-const backupVolume = volumeLimit(async (name, containersNotToStart = []) => {
+const backupVolume = volumeLimit(async (name) => {
   // Skip volumes we've already backed up
-  if (volumesAlreadyBackedUp.includes(name)) {
-    return;
-  }
+  if (volumesAlreadyBackedUp.includes(name)) return;
   volumesAlreadyBackedUp.push(name);
 
   const volume = docker.getVolume(name);
@@ -177,13 +185,6 @@ const backupVolume = volumeLimit(async (name, containersNotToStart = []) => {
       },
     },
   );
-
-  // Start the containers back up
-  await Promise.all(
-    containers
-      .filter(container => !containersNotToStart.includes(container.Id))
-      .map(container => startContainer(container.Id)),
-  );
 });
 
 // Back up single container by id
@@ -193,7 +194,6 @@ const backupContainer = containerLimit(async (id) => {
 
   const container = docker.getContainer(id);
   const inspect = await container.inspect();
-  const wasRunning = inspect.State.Running;
 
   // Backup volumes
   if (operateOnVolumes) {
@@ -204,11 +204,6 @@ const backupContainer = containerLimit(async (id) => {
     await Promise.all(
       volumes.map(volume => backupVolume(volume.Name, [inspect.Id])),
     );
-
-    // Start container if it was running
-    if (wasRunning) {
-      await startContainer(container.Id);
-    }
   }
 
   // Backup container
@@ -313,6 +308,8 @@ const restoreContainer = containerLimit(async (name) => {
 // Exports
 module.exports = {
   getAllContainers,
+  getRunningContainers,
+  startContainer,
   backupContainer,
   restoreContainer,
   pullImage,

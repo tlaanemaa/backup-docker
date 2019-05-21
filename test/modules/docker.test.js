@@ -34,7 +34,6 @@ describe('backupContainer', () => {
   it('should tar volumes, stop container and start it again', async () => {
     const dockerode = require('dockerode');
     dockerode.mockContainer.stop = jest.fn();
-    dockerode.mockContainer.start = jest.fn();
     dockerode.mockInspection.Id = 3;
     dockerode.mockInspection.Mounts = [{ Name: 'mount1', Destination: 'dest1', Type: 'volume' }];
     dockerode.prototype.listContainers = () => Promise.resolve([{ Id: 3 }]);
@@ -43,7 +42,6 @@ describe('backupContainer', () => {
     await docker.backupContainer(3);
 
     expect(dockerode.mockContainer.stop).toHaveBeenCalledTimes(1);
-    expect(dockerode.mockContainer.start).toHaveBeenCalledTimes(1);
     expect(dockerode.prototype.run).toHaveBeenCalledTimes(1);
     expect(dockerode.prototype.run).toHaveBeenLastCalledWith(
       'ubuntu',

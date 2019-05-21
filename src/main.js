@@ -1,10 +1,17 @@
 require('./modules/fileStructure');
 const commands = require('./commands');
-const { operation } = require('./modules/options');
+const { operation, operateOnVolumes } = require('./modules/options');
+const { ensureVolumeImageExists, getRunningContainers, startContainer } = require('./modules/docker');
 
 // Main method to run the tool
 module.exports = async () => {
+  // Make sure we have the volume operations image if we plan to use it
+  if (operateOnVolumes) await ensureVolumeImageExists();
+
+  const runningContainers = await getRunningContainers();
   const results = await commands[operation]();
+  await Promise.all(runningContainers.map(container => startContainer(container)));
+
   // eslint-disable-next-line no-console
   console.log('== Done ==');
 
