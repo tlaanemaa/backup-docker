@@ -127,27 +127,26 @@ describe('restoreContainer', () => {
 
   it('should untar volumes, stop container and start it again', async () => {
     const fs = require('fs');
-    fs.readdirSync = jest.fn().mockImplementation(() => ['mount1.tar', 'mount2.tar']);
+    fs.readdirSync = jest.fn().mockImplementation(() => ['mount1.tar', 'mount1.json']);
     const dockerode = require('dockerode');
+    dockerode.prototype.listContainers = () => Promise.resolve([{ Id: 3 }]);
     dockerode.mockContainer.stop = jest.fn();
-    dockerode.mockContainer.start = jest.fn();
     const docker = require('../../src/modules/docker');
 
     await docker.restoreContainer('orange');
 
     expect(dockerode.mockContainer.stop).toHaveBeenCalledTimes(1);
-    expect(dockerode.mockContainer.start).toHaveBeenCalledTimes(1);
-    expect(dockerode.prototype.run).toHaveBeenCalledTimes(2);
+    expect(dockerode.prototype.run).toHaveBeenCalledTimes(1);
     expect(dockerode.prototype.run).toHaveBeenLastCalledWith(
       'ubuntu',
-      ['tar', 'xvf', '/__volume_backup_mount__/mount2.tar', '--strip', '1', '--directory', '/__volume__'],
+      ['tar', 'xvf', '/__volume_backup_mount__/mount1.tar', '--strip', '1', '--directory', '/__volume__'],
       expect.any(Object),
       {
         HostConfig: {
           AutoRemove: true,
           Binds: [
             '/folder/volumes:/__volume_backup_mount__',
-            'mount2:/__volume__',
+            'mount1:/__volume__',
           ],
         },
       },
@@ -181,7 +180,7 @@ describe('restoreContainer', () => {
 
   it('should only restore volumes when only is volumes', async () => {
     const fs = require('fs');
-    fs.readdirSync = jest.fn().mockImplementation(() => ['mount1.tar', 'mount2.tar']);
+    fs.readdirSync = jest.fn().mockImplementation(() => ['mount1.tar', 'mount2.tar', 'mount1.json', 'mount2.json']);
     const dockerode = require('dockerode');
     const options = require('../../src/modules/options');
     options.operateOnContainers = false;

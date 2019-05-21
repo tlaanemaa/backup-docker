@@ -52,6 +52,7 @@ Docker.mockImage = {
 Docker.mockVolume = {
   inspect: () => ({
     Name: 'banana',
+    Labels: [],
   }),
 };
 
