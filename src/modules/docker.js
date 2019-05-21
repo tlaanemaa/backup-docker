@@ -32,7 +32,6 @@ const volumeLimit = createLimiter(1);
 // If we know that we will operate on volumes, get all volume files in advance
 // Also initialize a variable for pulling the volume operations image if needed
 const volumeFiles = operateOnVolumes ? getVolumeFilesSync() : [];
-let volumeImagePromise = Promise.resolve();
 
 // Get all containers
 const getContainers = async (all = true) => {
@@ -99,6 +98,9 @@ const ensureImageExists = async (name) => {
   const exists = await imageExists(name);
   if (!exists) await pullImage(name);
 };
+
+// Helper to pull volume image
+const ensureVolumeImageExists = () => ensureImageExists(volumeOperationsImage);
 
 // Helper to start container and log
 const startContainer = (id) => {
@@ -190,9 +192,6 @@ const backupVolume = volumeLimit(async (name, containersNotToStart = []) => {
 
 // Back up single container by id
 const backupContainer = containerLimit(async (id) => {
-  // Wait for the volume operations image to be downloaded before proceeding
-  await volumeImagePromise;
-
   // eslint-disable-next-line no-console
   console.log(`== Backing up container: ${id} ==`);
 
@@ -254,9 +253,6 @@ const restoreVolume = volumeLimit(async (name) => {
 
 // Restore (create) container by id
 const restoreContainer = containerLimit(async (name) => {
-  // Wait for the volume operations image to be downloaded before proceeding
-  await volumeImagePromise;
-
   // eslint-disable-next-line no-console
   console.log(`== Restoring container: ${name} ==`);
   const backupInspect = await loadContainerInspect(name);
@@ -318,11 +314,6 @@ const restoreContainer = containerLimit(async (name) => {
   return true;
 });
 
-// Start pulling the volume operations image if we plan to work on volumes
-if (operateOnVolumes) {
-  volumeImagePromise = ensureImageExists(volumeOperationsImage);
-}
-
 // Exports
 module.exports = {
   getContainers,
@@ -330,4 +321,5 @@ module.exports = {
   restoreContainer,
   pullImage,
   ensureImageExists,
+  ensureVolumeImageExists,
 };

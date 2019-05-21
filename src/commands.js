@@ -1,9 +1,17 @@
-const { containers: containerNames } = require('./modules/options');
-const { getContainers, restoreContainer, backupContainer } = require('./modules/docker');
+const { containers: containerNames, operateOnVolumes } = require('./modules/options');
 const { getContainerInspectFilesSync, logAndReturnErrors } = require('./modules/utils');
+const {
+  getContainers,
+  restoreContainer,
+  backupContainer,
+  ensureVolumeImageExists,
+} = require('./modules/docker');
 
 // Main backup function
 const backup = async () => {
+  // Make sure we have the volume operations image if we plan to use it
+  if (operateOnVolumes) await ensureVolumeImageExists();
+
   // Get all container names if needed
   const containers = containerNames.length
     ? containerNames
@@ -20,6 +28,9 @@ const backup = async () => {
 
 // Main restore function
 const restore = async () => {
+  // Make sure we have the volume operations image if we plan to use it
+  if (operateOnVolumes) await ensureVolumeImageExists();
+
   // Get all container names if needed
   const containers = containerNames.length
     ? containerNames
