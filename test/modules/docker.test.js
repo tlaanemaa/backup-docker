@@ -65,7 +65,7 @@ describe('backupContainer', () => {
     const fs = require('fs');
     const dockerode = require('dockerode');
     const options = require('../../src/modules/options');
-    options.onlyContainers = true;
+    options.operateOnVolumes = false;
     const docker = require('../../src/modules/docker');
 
     await docker.backupContainer(3);
@@ -78,7 +78,7 @@ describe('backupContainer', () => {
     const fs = require('fs');
     const dockerode = require('dockerode');
     const options = require('../../src/modules/options');
-    options.onlyVolumes = true;
+    options.operateOnContainers = false;
     const docker = require('../../src/modules/docker');
 
     await docker.backupContainer(3);
@@ -92,7 +92,7 @@ describe('backupContainer', () => {
     dockerode.mockInspection.Mounts = [];
     dockerode.mockContainer.stop = jest.fn();
     const options = require('../../src/modules/options');
-    options.onlyVolumes = true;
+    options.operateOnContainers = false;
     const docker = require('../../src/modules/docker');
 
     await docker.backupContainer(3);
@@ -172,7 +172,7 @@ describe('restoreContainer', () => {
   it('should only restore containers when only is containers', async () => {
     const dockerode = require('dockerode');
     const options = require('../../src/modules/options');
-    options.onlyContainers = true;
+    options.operateOnVolumes = false;
     const docker = require('../../src/modules/docker');
 
     await docker.restoreContainer('orange');
@@ -186,7 +186,7 @@ describe('restoreContainer', () => {
     fs.readdirSync = jest.fn().mockImplementation(() => ['mount1.tar', 'mount2.tar']);
     const dockerode = require('dockerode');
     const options = require('../../src/modules/options');
-    options.onlyVolumes = true;
+    options.operateOnContainers = false;
     const docker = require('../../src/modules/docker');
 
     await docker.restoreContainer('orange');
@@ -201,7 +201,7 @@ describe('restoreContainer', () => {
     const dockerode = require('dockerode');
     dockerode.mockContainer.stop = jest.fn();
     const options = require('../../src/modules/options');
-    options.onlyVolumes = true;
+    options.operateOnContainers = true;
     const docker = require('../../src/modules/docker');
 
     await docker.restoreContainer('orange');

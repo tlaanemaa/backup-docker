@@ -1,7 +1,7 @@
 const Docker = require('dockerode');
 const { parseRepositoryTag } = require('dockerode/lib/util');
 const createLimiter = require('limit-async');
-const { socketPath, onlyContainers, onlyVolumes } = require('./options');
+const { socketPath, operateOnContainers, operateOnVolumes } = require('./options');
 const folderStructure = require('./folderStructure');
 const { containerInspect2Config, volumeInspect2Config } = require('./inspect2config');
 const {
@@ -28,10 +28,6 @@ const docker = socketPath ? new Docker({ socketPath }) : new Docker();
 // Construct async limits to avoid doing too many concurrent operations
 const containerLimit = createLimiter(1);
 const volumeLimit = createLimiter(1);
-
-// Decide what we will operate on
-const operateOnContainers = onlyContainers || (!onlyContainers && !onlyVolumes);
-const operateOnVolumes = onlyVolumes || (!onlyVolumes && !onlyContainers);
 
 // If we know that we will operate on volumes, get all volume files in advance
 // Also initialize a variable for pulling the volume operations image if needed

@@ -46,4 +46,10 @@ if (!commandArgs.operation) {
   program.help();
 }
 
-module.exports = { ...commandArgs, ...program.opts() };
+const options = { ...commandArgs, ...program.opts() };
+
+module.exports = {
+  ...options,
+  operateOnContainers: options.onlyContainers || (!options.onlyContainers && !options.onlyVolumes),
+  operateOnVolumes: options.onlyVolumes || (!options.onlyVolumes && !options.onlyContainers),
+};
