@@ -144,11 +144,17 @@ const backupVolume = volumeLimit(async (name) => {
   const volume = docker.getVolume(name);
   const inspect = await volume.inspect();
 
-  // Skip volumes we don't want to backup
-  if (
-    isNfsVolume(inspect)
-    || isNonPersistentVolume(inspect)
-  ) {
+  // Skip non-persistent volumes completely
+  if (isNonPersistentVolume(inspect)) {
+    return;
+  }
+
+  // eslint-disable-next-line no-console
+  console.log(`Saving volume inspect for ${name}...`);
+  await saveVolumeInspect(inspect);
+
+  // Skip NFS volume contents
+  if (isNfsVolume(inspect)) {
     return;
   }
 
@@ -164,10 +170,6 @@ const backupVolume = volumeLimit(async (name) => {
   await Promise.all(
     containers.map(container => stopContainer(container.Id)),
   );
-
-  // eslint-disable-next-line no-console
-  console.log(`Saving volume inspect for ${name}...`);
-  await saveVolumeInspect(inspect);
 
   // eslint-disable-next-line no-console
   console.log(`Starting volume backup for ${name}...`);
