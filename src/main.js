@@ -1,3 +1,4 @@
+require('./modules/fileStructure');
 const commands = require('./commands');
 const { operation } = require('./modules/options');
 

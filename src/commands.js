@@ -1,5 +1,6 @@
 const { containers: containerNames, operateOnVolumes } = require('./modules/options');
-const { getContainerInspectFilesSync, logAndReturnErrors } = require('./modules/utils');
+const { logAndReturnErrors } = require('./modules/utils');
+const { containerInspects } = require('./modules/fileStructure.js');
 const {
   getContainers,
   restoreContainer,
@@ -34,7 +35,7 @@ const restore = async () => {
   // Get all container names if needed
   const containers = containerNames.length
     ? containerNames
-    : getContainerInspectFilesSync();
+    : containerInspects;
 
   // Restore containers
   return Promise.all(containers.map(

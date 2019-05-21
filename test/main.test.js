@@ -68,7 +68,7 @@ describe('restore', () => {
       { name: 'b', result: true },
       { name: 'c', result: true },
     ]);
-    expect(fs.readdirSync).toHaveBeenCalledTimes(1);
+    expect(fs.readdirSync).toHaveBeenCalledTimes(3);
     expect(fs.readdirSync).toHaveBeenCalledWith('/folder/containers');
     expect(docker.restoreContainer).toHaveBeenCalledTimes(3);
     expect(docker.restoreContainer).toHaveBeenLastCalledWith('c');
