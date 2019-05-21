@@ -144,7 +144,7 @@ const stopContainer = async (id) => {
 const isVolume = mount => mount.Name && mount.Type === 'volume';
 
 // Helper to detect NFS volumes
-const isNfsVolume = inspect => inspect.Options && !!inspect.Options.type.match(/nfs/i);
+const isNfsVolume = inspect => inspect.Options && typeof inspect.Options.type === 'string' && !!inspect.Options.type.match(/nfs/i);
 
 // Helper to detect non-persistent volumes
 const isNonPersistentVolume = inspect => inspect.Labels == null;
