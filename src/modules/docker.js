@@ -342,7 +342,7 @@ const restoreContainer = containerLimit(async (name) => {
     && backupInspect.State.Running
     && !inspect.State.Running
   ) {
-    await startContainer(container.Id);
+    await startContainer(inspect.Id);
   }
 
   return true;
