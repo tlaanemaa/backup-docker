@@ -44,9 +44,7 @@ const getAllContainers = async () => {
 // Get running containers
 const getRunningContainers = async () => {
   const containers = await docker.listContainers({
-    filters: [
-      { status: 'running' },
-    ],
+    filters: { status: ['running'] },
   });
   return containers.map(container => container.Id);
 };
@@ -177,10 +175,10 @@ const backupVolume = volumeLimit(async (name) => {
 
   // Get containers attached to this volume so we can stop them
   const containers = await docker.listContainers({
-    filters: [
-      { volume: name },
-      { status: 'running' },
-    ],
+    filters: {
+      volume: [name],
+      status: ['running'],
+    },
   });
 
   // Stop these containers so they wouldn't change their data
@@ -254,10 +252,10 @@ const restoreVolume = volumeLimit(async (name) => {
   if (volumeArchives.includes(name)) {
     // Get containers attached to this volume so we can stop them
     const containers = await docker.listContainers({
-      filters: [
-        { volume: name },
-        { status: 'running' },
-      ],
+      filters: {
+        volume: [name],
+        status: ['running'],
+      },
     });
 
     // Stop these containers so they wouldn't change their data
