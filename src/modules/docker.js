@@ -52,8 +52,7 @@ const getRunningContainers = async () => {
 // Check if a volume already exists
 const volumeExists = async (name) => {
   try {
-    const volume = docker.getVolume(name);
-    await volume.inspect();
+    await docker.getVolume(name).inspect();
     return true;
   } catch (e) {
     return false;
@@ -106,8 +105,7 @@ const pullImage = name => new Promise((resolve, reject) => {
 // Helper to check if an image exists locally
 const imageExists = async (name) => {
   try {
-    const image = docker.getImage(name);
-    await image.inspect();
+    await docker.getImage(name).inspect();
     return true;
   } catch (e) {
     return false;
@@ -170,8 +168,7 @@ const backupVolume = volumeLimit(async (name) => {
   if (volumesAlreadyBackedUp.includes(name)) return;
   volumesAlreadyBackedUp.push(name);
 
-  const volume = docker.getVolume(name);
-  const inspect = await volume.inspect();
+  const inspect = await docker.getVolume(name).inspect();
 
   // Skip non-persistent volumes completely
   if (!nonPersistentVolumes && isNonPersistentVolume(inspect)) {
@@ -223,8 +220,7 @@ const backupContainer = containerLimit(async (id) => {
   // eslint-disable-next-line no-console
   console.log(`== Backing up container: ${id} ==`);
 
-  const container = docker.getContainer(id);
-  const inspect = await container.inspect();
+  const inspect = await docker.getContainer(id).inspect();
 
   // Backup volumes
   if (operateOnVolumes) {
