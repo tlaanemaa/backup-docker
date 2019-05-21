@@ -301,25 +301,8 @@ const restoreVolume = volumeLimit(async (name) => {
 const restoreContainer = containerLimit(async (name) => {
   // eslint-disable-next-line no-console
   console.log(`== Restoring container: ${name} ==`);
-  const backupInspect = await loadContainerInspect(name);
 
-  // Restore container
-  let container = null;
-  if (operateOnContainers) {
-    // Pull the image if it doesn't exist
-    await ensureImageExists(backupInspect.Config.Image);
-
-    // eslint-disable-next-line no-console
-    console.log('Creating container...');
-    container = await docker.createContainer(containerInspect2Config(backupInspect));
-  } else {
-    // eslint-disable-next-line no-console
-    console.log('Getting container...');
-    container = await docker.getContainer(name);
-  }
-
-  // Get restored (or existing if ---only-volumes) container's inspect
-  const inspect = await container.inspect();
+  const inspect = await loadContainerInspect(name);
 
   // Restore volumes
   if (operateOnVolumes) {
@@ -336,13 +319,20 @@ const restoreContainer = containerLimit(async (name) => {
     }
   }
 
-  // Start the container if it was backed up in a running state and is not currently running
-  if (
-    operateOnContainers
-    && backupInspect.State.Running
-    && !inspect.State.Running
-  ) {
-    await startContainer(inspect.Id);
+  // Restore container
+  if (operateOnContainers) {
+    // Pull the image if it doesn't exist
+    await ensureImageExists(inspect.Config.Image);
+
+    // eslint-disable-next-line no-console
+    console.log('Creating container...');
+    const container = await docker.createContainer(containerInspect2Config(inspect));
+    const newInspect = await container.inspect();
+
+    // Start the container if it was backed up in a running state and is not currently running
+    if (inspect.State.Running) {
+      await startContainer(newInspect.Id);
+    }
   }
 
   return true;
