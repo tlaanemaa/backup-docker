@@ -48,6 +48,7 @@ if (!commandArgs.operation) {
 
 const options = { ...commandArgs, ...program.opts() };
 
+// Convert volume and container switches to more easily usable values
 module.exports = {
   ...options,
   operateOnContainers: options.onlyContainers || (!options.onlyContainers && !options.onlyVolumes),
