@@ -1,10 +1,16 @@
 const Docker = require('dockerode');
 const { parseRepositoryTag } = require('dockerode/lib/util');
 const createLimiter = require('limit-async');
-const { socketPath, operateOnContainers, operateOnVolumes } = require('./options');
 const { folders } = require('./constants');
 const { volumeArchives, volumeInspects } = require('./fileStructure');
 const { containerInspect2Config, volumeInspect2Config } = require('./inspect2config');
+const {
+  socketPath,
+  operateOnContainers,
+  operateOnVolumes,
+  nfsVolumeContents,
+  nonPersistentVolumes,
+} = require('./options');
 const {
   saveContainerInspect,
   saveVolumeInspect,
@@ -156,7 +162,7 @@ const backupVolume = volumeLimit(async (name) => {
   const inspect = await volume.inspect();
 
   // Skip non-persistent volumes completely
-  if (isNonPersistentVolume(inspect)) {
+  if (!nonPersistentVolumes && isNonPersistentVolume(inspect)) {
     return;
   }
 
@@ -165,7 +171,7 @@ const backupVolume = volumeLimit(async (name) => {
   await saveVolumeInspect(inspect);
 
   // Skip NFS volume contents
-  if (isNfsVolume(inspect)) {
+  if (!nfsVolumeContents && isNfsVolume(inspect)) {
     return;
   }
 
