@@ -35,23 +35,26 @@ describe('backupContainer', () => {
     const dockerode = require('dockerode');
     dockerode.mockContainer.stop = jest.fn();
     dockerode.mockContainer.start = jest.fn();
+    dockerode.mockInspection.Id = 3;
+    dockerode.mockInspection.Mounts = [{ Name: 'mount1', Destination: 'dest1', Type: 'volume' }];
+    dockerode.prototype.listContainers = () => Promise.resolve([{ Id: 3 }]);
     const docker = require('../../src/modules/docker');
 
     await docker.backupContainer(3);
 
-    expect(dockerode.mockContainer.stop).toHaveBeenCalledTimes(6);
-    expect(dockerode.mockContainer.start).toHaveBeenCalledTimes(7);
-    expect(dockerode.prototype.run).toHaveBeenCalledTimes(2);
+    expect(dockerode.mockContainer.stop).toHaveBeenCalledTimes(1);
+    expect(dockerode.mockContainer.start).toHaveBeenCalledTimes(1);
+    expect(dockerode.prototype.run).toHaveBeenCalledTimes(1);
     expect(dockerode.prototype.run).toHaveBeenLastCalledWith(
       'ubuntu',
-      ['tar', 'cvf', '/__volume_backup_mount__/mount2.tar', '/__volume__'],
+      ['tar', 'cvf', '/__volume_backup_mount__/mount1.tar', '/__volume__'],
       expect.any(Object),
       {
         HostConfig: {
           AutoRemove: true,
           Binds: [
             '/folder/volumes:/__volume_backup_mount__',
-            'mount2:/__volume__',
+            'mount1:/__volume__',
           ],
         },
       },
