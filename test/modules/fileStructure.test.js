@@ -9,7 +9,7 @@ describe('folderStructure', () => {
     const fs = require('fs');
     fs.existsSync = jest.fn().mockReturnValue(true);
 
-    require('../../src/modules/folderStructure');
+    require('../../src/modules/fileStructure');
 
     expect(fs.mkdirSync).toHaveBeenCalledTimes(0);
   });

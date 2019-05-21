@@ -1,7 +1,7 @@
 const { promisify } = require('util');
 const fs = require('fs');
 const path = require('path');
-const folderStructure = require('./folderStructure');
+const { folders } = require('./constants');
 
 // Promisified fs helpers
 const writeFile = promisify(fs.writeFile);
@@ -21,8 +21,8 @@ const getInspectFilesSync = dir => getFilesSync(dir, '.json')
   .map(file => path.basename(file, path.extname(file)));
 
 // Specific helpers for containers and volumes
-const getContainerInspectFilesSync = () => getInspectFilesSync(folderStructure.containers);
-const getVolumeInspectFilesSync = () => getInspectFilesSync(folderStructure.volumes);
+const getContainerInspectFilesSync = () => getInspectFilesSync(folders.containers);
+const getVolumeInspectFilesSync = () => getInspectFilesSync(folders.volumes);
 
 // Load inspects
 const loadInspect = async (name, dir) => {
@@ -32,8 +32,8 @@ const loadInspect = async (name, dir) => {
 };
 
 // Specific helpers for containers and volumes
-const loadContainerInspect = inspect => loadInspect(inspect, folderStructure.containers);
-const loadVolumeInspect = inspect => loadInspect(inspect, folderStructure.volumes);
+const loadContainerInspect = inspect => loadInspect(inspect, folders.containers);
+const loadVolumeInspect = inspect => loadInspect(inspect, folders.volumes);
 
 // Write inspects
 const saveInspect = (inspect, dir) => {
@@ -44,11 +44,11 @@ const saveInspect = (inspect, dir) => {
 };
 
 // Specific helpers for containers and volumes
-const saveContainerInspect = inspect => saveInspect(inspect, folderStructure.containers);
-const saveVolumeInspect = inspect => saveInspect(inspect, folderStructure.volumes);
+const saveContainerInspect = inspect => saveInspect(inspect, folders.containers);
+const saveVolumeInspect = inspect => saveInspect(inspect, folders.volumes);
 
 // Get all volume backups synchronously
-const getVolumeFilesSync = () => getFilesSync(folderStructure.volumes, '.tar')
+const getVolumeArchivesSync = () => getFilesSync(folders.volumes, '.tar')
   .map(file => path.basename(file, path.extname(file)));
 
 // Helper to catch errors, log and then return them
@@ -77,7 +77,7 @@ module.exports = {
   loadVolumeInspect,
   saveContainerInspect,
   saveVolumeInspect,
-  getVolumeFilesSync,
+  getVolumeArchivesSync,
   logAndReturnErrors,
   round,
 };

@@ -2,14 +2,14 @@ const Docker = require('dockerode');
 const { parseRepositoryTag } = require('dockerode/lib/util');
 const createLimiter = require('limit-async');
 const { socketPath, operateOnContainers, operateOnVolumes } = require('./options');
-const folderStructure = require('./folderStructure');
+const { folders } = require('./constants');
+const { volumeArchives } = require('./fileStructure');
 const { containerInspect2Config, volumeInspect2Config } = require('./inspect2config');
 const {
   saveContainerInspect,
   saveVolumeInspect,
   loadContainerInspect,
   loadVolumeInspect,
-  getVolumeFilesSync,
   round,
 } = require('./utils');
 
@@ -28,10 +28,6 @@ const docker = socketPath ? new Docker({ socketPath }) : new Docker();
 // Construct async limits to avoid doing too many concurrent operations
 const containerLimit = createLimiter(1);
 const volumeLimit = createLimiter(1);
-
-// If we know that we will operate on volumes, get all volume files in advance
-// Also initialize a variable for pulling the volume operations image if needed
-const volumeFiles = operateOnVolumes ? getVolumeFilesSync() : [];
 
 // Get all containers
 const getContainers = async (all = true) => {
@@ -175,7 +171,7 @@ const backupVolume = volumeLimit(async (name, containersNotToStart = []) => {
       HostConfig: {
         AutoRemove: true,
         Binds: [
-          `${folderStructure.volumes}:${dockerBackupMountDir}`,
+          `${folders.volumes}:${dockerBackupMountDir}`,
           `${name}:${dockerBackupVolumeDir}`,
         ],
       },
@@ -243,7 +239,7 @@ const restoreVolume = volumeLimit(async (name) => {
       HostConfig: {
         AutoRemove: true,
         Binds: [
-          `${folderStructure.volumes}:${dockerBackupMountDir}`,
+          `${folders.volumes}:${dockerBackupMountDir}`,
           `${name}:${dockerBackupVolumeDir}`,
         ],
       },
@@ -280,7 +276,7 @@ const restoreContainer = containerLimit(async (name) => {
   if (operateOnVolumes) {
     // Extract and filter volumes to know if we have anything to restore
     const volumes = inspect.Mounts
-      .filter(mount => mount.Name && mount.Type === 'volume' && volumeFiles.includes(mount.Name));
+      .filter(mount => mount.Name && mount.Type === 'volume' && volumeArchives.includes(mount.Name));
 
     // Only go ahead if we actually have backup files to restore
     if (volumes.length) {
