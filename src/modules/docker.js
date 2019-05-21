@@ -124,11 +124,18 @@ const ensureImageExists = async (name) => {
 const ensureVolumeImageExists = () => ensureImageExists(volumeOperationsImage);
 
 // Helper to start container and log
-const startContainer = (id) => {
+const startContainer = async (id) => {
   // eslint-disable-next-line no-console
   console.log(`Starting container ${id}...`);
   const container = docker.getContainer(id);
-  return container.start();
+  try {
+    await container.start();
+  } catch (e) {
+    // Ignore 300 code errors
+    if (typeof e.statusCode === 'number' && e.statusCode >= 400) {
+      throw (e);
+    }
+  }
 };
 
 // Helper to stop container, wait and log
@@ -136,8 +143,15 @@ const stopContainer = async (id) => {
   // eslint-disable-next-line no-console
   console.log(`Stopping container ${id}...`);
   const container = docker.getContainer(id);
-  await container.stop();
-  return container.wait();
+  try {
+    await container.stop();
+    await container.wait();
+  } catch (e) {
+    // Ignore 300 code errors
+    if (typeof e.statusCode === 'number' && e.statusCode >= 400) {
+      throw (e);
+    }
+  }
 };
 
 // Helper to detect volumes
