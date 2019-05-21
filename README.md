@@ -28,10 +28,14 @@ _When run with `restore` command, backup-docker will expect these folders to exi
 - `backup-docker restore banana --only-containers` - Will restore only the container named "banana" and not it's volumes
 - `backup-docker restore banana --only-volumes` - Will restore the volumes attached to the container named "banana" but not the container itself. The container itself must already exist in the docker instance
 
-## All options
+## All general options
 - `-v, --version` - output the version number
 - `-d, --directory [directory]` - directory name to save to or look for container backups (default: current working directory)
 - `-s, --socket-path [socket-path]` - docker socket path
 - `--only-containers` - backup/restore containers only
 - `--only-volumes` - backup/restore volumes only. If used with the restore command then the container is expected to already exist and the container names, if not provided, are still taken from backups
 - `-h, --help` - output usage information
+
+## Backup specific options
+- `--nfs-volume-contents` - also backup the contents of nfs volumes
+- `--non-persistent-volumes` - also backup non-persistent (unnamed) volumes
