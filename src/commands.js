@@ -2,7 +2,7 @@ const { containers: containerNames, operateOnVolumes } = require('./modules/opti
 const { logAndReturnErrors } = require('./modules/utils');
 const { containerInspects } = require('./modules/fileStructure.js');
 const {
-  getContainers,
+  getAllContainers,
   restoreContainer,
   backupContainer,
   ensureVolumeImageExists,
@@ -16,7 +16,7 @@ const backup = async () => {
   // Get all container names if needed
   const containers = containerNames.length
     ? containerNames
-    : await getContainers();
+    : await getAllContainers();
 
   // Backup containers
   return Promise.all(containers.map(

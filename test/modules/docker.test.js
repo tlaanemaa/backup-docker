@@ -5,11 +5,11 @@ jest.mock('../../src/modules/options.js');
 
 beforeEach(() => jest.resetModules());
 
-describe('getContainers', () => {
+describe('getAllContainers', () => {
   it('should return an array of container ids', async () => {
     const docker = require('../../src/modules/docker');
 
-    const containers = await docker.getContainers();
+    const containers = await docker.getAllContainers();
 
     expect(containers).toEqual([1, 2, 3]);
   });

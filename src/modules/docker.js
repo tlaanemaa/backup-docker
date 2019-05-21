@@ -30,8 +30,8 @@ const containerLimit = createLimiter(1);
 const volumeLimit = createLimiter(1);
 
 // Get all containers
-const getContainers = async (all = true) => {
-  const containers = await docker.listContainers({ all });
+const getAllContainers = async () => {
+  const containers = await docker.listContainers({ all: true });
   return containers.map(container => container.Id);
 };
 
@@ -312,7 +312,7 @@ const restoreContainer = containerLimit(async (name) => {
 
 // Exports
 module.exports = {
-  getContainers,
+  getAllContainers,
   backupContainer,
   restoreContainer,
   pullImage,
