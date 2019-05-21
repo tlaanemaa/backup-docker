@@ -19,7 +19,8 @@ program
   .description('backup given or all containers in docker instance')
   .option('--nfs-volume-contents', 'also backup the contents of nfs volumes')
   .option('--non-persistent-volumes', 'also backup non-persistent (unnamed) volumes')
-  .action(async (containers) => {
+  .action(async (containers, opts) => {
+    Object.assign(commandArgs, opts.opts());
     commandArgs.operation = 'backup';
     commandArgs.containers = containers;
   });
