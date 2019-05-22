@@ -11,7 +11,7 @@ describe('getAllContainers', () => {
 
     const containers = await docker.getAllContainers();
 
-    expect(containers).toEqual([1, 2, 3]);
+    expect(containers).toEqual(['banana', 'mango', 'orange']);
   });
 });
 
@@ -36,7 +36,7 @@ describe('backupContainer', () => {
     dockerode.mockContainer.stop = jest.fn();
     dockerode.mockInspection.Id = 3;
     dockerode.mockInspection.Mounts = [{ Name: 'mount1', Destination: 'dest1', Type: 'volume' }];
-    dockerode.prototype.listContainers = () => Promise.resolve([{ Id: 3 }]);
+    dockerode.prototype.listContainers = () => Promise.resolve([{ Id: 3, Names: '/banana' }]);
     const docker = require('../../src/modules/docker');
 
     await docker.backupContainer(3);
@@ -129,7 +129,7 @@ describe('restoreContainer', () => {
     const fs = require('fs');
     fs.readdirSync = jest.fn().mockImplementation(() => ['mount1.tar', 'mount1.json']);
     const dockerode = require('dockerode');
-    dockerode.prototype.listContainers = () => Promise.resolve([{ Id: 3 }]);
+    dockerode.prototype.listContainers = () => Promise.resolve([{ Id: 3, Names: '/banana' }]);
     dockerode.mockContainer.stop = jest.fn();
     const docker = require('../../src/modules/docker');
 

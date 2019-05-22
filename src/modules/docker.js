@@ -22,6 +22,7 @@ const {
   loadContainerInspect,
   loadVolumeInspect,
   round,
+  formatName,
 } = require('./utils');
 
 // Create docker instance using the provided socket path if available
@@ -46,7 +47,8 @@ const wrapDockerErr = func => async (...args) => {
 };
 
 // Reduce container list to ids
-const reduceContainerList = containers => containers.map(container => container.Id);
+const reduceContainerList = containers => containers
+  .map(container => formatName(container.Names[0]));
 
 // Get all containers
 const getAllContainers = async () => {
