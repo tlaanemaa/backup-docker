@@ -1,9 +1,14 @@
 const Docker = require('dockerode');
 const { parseRepositoryTag } = require('dockerode/lib/util');
 const createLimiter = require('limit-async');
-const { folders } = require('./constants');
 const { volumeArchives, volumeInspects } = require('./fileStructure');
 const { containerInspect2Config, volumeInspect2Config } = require('./inspect2config');
+const {
+  folders,
+  volumeOperationsImage,
+  dockerBackupMountDir,
+  dockerBackupVolumeDir,
+} = require('./constants');
 const {
   socketPath,
   operateOnContainers,
@@ -18,15 +23,6 @@ const {
   loadVolumeInspect,
   round,
 } = require('./utils');
-
-// Name of the image we will use for volume operations
-const volumeOperationsImage = 'ubuntu';
-
-// Volume backup directory mount path inside the container.
-const dockerBackupMountDir = '/__volume_backup_mount__';
-
-// Volume mount directory inside the container when backing it up
-const dockerBackupVolumeDir = '/__volume__';
 
 // Create docker instance using the provided socket path if available
 const docker = socketPath ? new Docker({ socketPath }) : new Docker();
