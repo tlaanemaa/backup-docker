@@ -9,7 +9,7 @@ module.exports = {
   },
 
   // Name of the image we will use for volume operations
-  volumeOperationsImage: 'ubuntu',
+  volumeOperationsImage: 'ubuntu:latest',
 
   // Volume backup directory mount path inside the container.
   dockerBackupMountDir: '/__volume_backup_mount__',
