@@ -12,7 +12,7 @@ module.exports = async () => {
   const results = await commands[operation]();
 
   // eslint-disable-next-line no-console
-  console.log('== Starting containers that were stopped for volume backups ==');
+  console.log('== Ensuring containers that were stopped for volume backups are started again ==');
   await Promise.all(runningContainers.map(container => startContainer(container)));
 
   // eslint-disable-next-line no-console
