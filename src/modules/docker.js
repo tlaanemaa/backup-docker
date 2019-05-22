@@ -45,10 +45,13 @@ const wrapDockerErr = func => async (...args) => {
   }
 };
 
+// Reduce container list to ids
+const reduceContainerList = containers => containers.map(container => container.Id);
+
 // Get all containers
 const getAllContainers = async () => {
   const containers = await docker.listContainers({ all: true });
-  return containers.map(container => container.Id);
+  return reduceContainerList(containers);
 };
 
 // Get running containers
@@ -56,7 +59,18 @@ const getRunningContainers = async () => {
   const containers = await docker.listContainers({
     filters: { status: ['running'] },
   });
-  return containers.map(container => container.Id);
+  return reduceContainerList(containers);
+};
+
+// Get all running containers attached to a volume
+const getRunningContainersWithVolume = async (volumeName) => {
+  const containers = await docker.listContainers({
+    filters: {
+      volume: [volumeName],
+      status: ['running'],
+    },
+  });
+  return reduceContainerList(containers);
 };
 
 // Check if a volume already exists
@@ -180,12 +194,7 @@ const backupVolume = volumeLimit(async (name) => {
   }
 
   // Get containers attached to this volume so we can stop them
-  const containers = await docker.listContainers({
-    filters: {
-      volume: [name],
-      status: ['running'],
-    },
-  });
+  const containers = await getRunningContainersWithVolume(name);
 
   // Stop these containers so they wouldn't change their data
   await Promise.all(
@@ -256,12 +265,7 @@ const restoreVolume = volumeLimit(async (name) => {
 
   if (volumeArchives.includes(name)) {
     // Get containers attached to this volume so we can stop them
-    const containers = await docker.listContainers({
-      filters: {
-        volume: [name],
-        status: ['running'],
-      },
-    });
+    const containers = await getRunningContainersWithVolume(name);
 
     // Stop these containers so they wouldn't change their data
     await Promise.all(
