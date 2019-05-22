@@ -194,11 +194,11 @@ const backupVolume = volumeLimit(async (name) => {
   }
 
   // Get containers attached to this volume so we can stop them
-  const containers = await getRunningContainersWithVolume(name);
+  const containerIds = await getRunningContainersWithVolume(name);
 
   // Stop these containers so they wouldn't change their data
   await Promise.all(
-    containers.map(container => stopContainer(container.Id)),
+    containerIds.map(containerId => stopContainer(containerId)),
   );
 
   // eslint-disable-next-line no-console
@@ -265,11 +265,11 @@ const restoreVolume = volumeLimit(async (name) => {
 
   if (volumeArchives.includes(name)) {
     // Get containers attached to this volume so we can stop them
-    const containers = await getRunningContainersWithVolume(name);
+    const containerIds = await getRunningContainersWithVolume(name);
 
     // Stop these containers so they wouldn't change their data
     await Promise.all(
-      containers.map(container => stopContainer(container.Id)),
+      containerIds.map(containerId => stopContainer(containerId)),
     );
 
     // eslint-disable-next-line no-console
