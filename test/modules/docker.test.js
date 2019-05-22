@@ -44,7 +44,7 @@ describe('backupContainer', () => {
     expect(dockerode.mockContainer.stop).toHaveBeenCalledTimes(1);
     expect(dockerode.prototype.run).toHaveBeenCalledTimes(1);
     expect(dockerode.prototype.run).toHaveBeenLastCalledWith(
-      'ubuntu',
+      'ubuntu:latest',
       ['tar', 'cvf', '/__volume_backup_mount__/mount1.tar', '/__volume__'],
       expect.any(Object),
       {
@@ -138,7 +138,7 @@ describe('restoreContainer', () => {
     expect(dockerode.mockContainer.stop).toHaveBeenCalledTimes(1);
     expect(dockerode.prototype.run).toHaveBeenCalledTimes(1);
     expect(dockerode.prototype.run).toHaveBeenLastCalledWith(
-      'ubuntu',
+      'ubuntu:latest',
       ['tar', 'xvf', '/__volume_backup_mount__/mount1.tar', '--strip', '1', '--directory', '/__volume__'],
       expect.any(Object),
       {
