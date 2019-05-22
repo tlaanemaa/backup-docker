@@ -31,6 +31,20 @@ const docker = socketPath ? new Docker({ socketPath }) : new Docker();
 const containerLimit = createLimiter(1);
 const volumeLimit = createLimiter(1);
 
+// Docker error wrapper. This just ignores errors with code < 400
+const wrapDockerErr = func => async (...args) => {
+  try {
+    // We shouldn't return here because we don't (can't) return when a 300 error occurs
+    await func(...args);
+  } catch (e) {
+    // Ignore 300 code errors
+    if (typeof e.statusCode === 'number' && e.statusCode < 400) {
+      return;
+    }
+    throw (e);
+  }
+};
+
 // Get all containers
 const getAllContainers = async () => {
   const containers = await docker.listContainers({ all: true });
@@ -118,35 +132,20 @@ const ensureImageExists = async (name) => {
 const ensureVolumeImageExists = () => ensureImageExists(volumeOperationsImage);
 
 // Helper to start container and log
-const startContainer = async (id) => {
+const startContainer = wrapDockerErr(async (id) => {
   // eslint-disable-next-line no-console
   console.log(`Starting container ${id}...`);
-  const container = docker.getContainer(id);
-  try {
-    await container.start();
-  } catch (e) {
-    // Ignore 300 code errors
-    if (typeof e.statusCode === 'number' && e.statusCode >= 400) {
-      throw (e);
-    }
-  }
-};
+  await docker.getContainer(id).start();
+});
 
 // Helper to stop container, wait and log
-const stopContainer = async (id) => {
+const stopContainer = wrapDockerErr(async (id) => {
   // eslint-disable-next-line no-console
   console.log(`Stopping container ${id}...`);
   const container = docker.getContainer(id);
-  try {
-    await container.stop();
-    await container.wait();
-  } catch (e) {
-    // Ignore 300 code errors
-    if (typeof e.statusCode === 'number' && e.statusCode >= 400) {
-      throw (e);
-    }
-  }
-};
+  await container.stop();
+  await container.wait();
+});
 
 // Helper to detect volumes
 const isVolume = mount => mount.Name && mount.Type === 'volume';
@@ -340,4 +339,5 @@ module.exports = {
   pullImage,
   ensureImageExists,
   ensureVolumeImageExists,
+  wrapDockerErr,
 };

@@ -285,3 +285,52 @@ describe('ensureImageExists', () => {
     expect(docker.pullImage).toHaveBeenCalledTimes(0);
   });
 });
+
+describe('wrapDockerErr', () => {
+  it('should hide < 400 errors since those are actually fine', async () => {
+    expect.assertions(1);
+    const { wrapDockerErr } = require('../../src/modules/docker');
+    const errorFunc = () => {
+      const err = new Error('blah');
+      err.statusCode = 304;
+      throw err;
+    };
+
+    try {
+      const result = await wrapDockerErr(errorFunc)();
+      expect(result).toBe(undefined);
+    } catch (e) {
+      // Do nothing
+    }
+  });
+
+  it('should throw >= 400 errors', async () => {
+    expect.assertions(1);
+    const { wrapDockerErr } = require('../../src/modules/docker');
+    const errorFunc = () => {
+      const err = new Error('blah');
+      err.statusCode = 404;
+      throw err;
+    };
+
+    try {
+      await wrapDockerErr(errorFunc)();
+    } catch (e) {
+      expect(e).toBeInstanceOf(Error);
+    }
+  });
+
+  it('should throw errors without a statusCode', async () => {
+    expect.assertions(1);
+    const { wrapDockerErr } = require('../../src/modules/docker');
+    const errorFunc = () => {
+      throw new Error('blah');
+    };
+
+    try {
+      await wrapDockerErr(errorFunc)();
+    } catch (e) {
+      expect(e).toBeInstanceOf(Error);
+    }
+  });
+});
