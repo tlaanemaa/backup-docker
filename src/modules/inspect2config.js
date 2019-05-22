@@ -44,6 +44,7 @@ const containerInspect2Config = (container) => {
   return config;
 };
 
+// Convert volume inspect to a config used for volume creation
 const volumeInspect2Config = inspect => ({
   Name: inspect.Name,
   Driver: inspect.Driver,
