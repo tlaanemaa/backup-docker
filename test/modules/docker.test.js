@@ -153,6 +153,19 @@ describe('restoreContainer', () => {
     );
   });
 
+  it('should create the volume if it doesn\'t exist', async () => {
+    const fs = require('fs');
+    fs.readdirSync = jest.fn().mockImplementation(() => ['mount1.tar', 'mount1.json']);
+    const dockerode = require('dockerode');
+    dockerode.prototype.getVolume = () => null;
+    const docker = require('../../src/modules/docker');
+
+    await docker.restoreContainer('orange');
+
+    expect(dockerode.prototype.createVolume).toHaveBeenCalledTimes(1);
+    expect(dockerode.prototype.createVolume).toHaveBeenCalledWith(expect.any(Object));
+  });
+
   it('should start the container if it was backed up in a running state', async () => {
     const dockerode = require('dockerode');
     dockerode.mockContainer.stop = jest.fn();
