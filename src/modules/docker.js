@@ -168,7 +168,7 @@ const isVolume = mount => mount.Name && mount.Type === 'volume';
 const isNfsVolume = inspect => inspect.Options && typeof inspect.Options.type === 'string' && !!inspect.Options.type.match(/nfs/i);
 
 // Helper to detect non-persistent volumes
-const isNonPersistentVolume = inspect => inspect.Labels == null;
+const isNonPersistentVolume = inspect => inspect.Labels == null && inspect.Options == null;
 
 // Backup volume as a tar file
 const volumesAlreadyBackedUp = [];
