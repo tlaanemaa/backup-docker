@@ -20,7 +20,7 @@ describe('backup', () => {
       { name: 7, result: true },
       { name: 8, result: true },
     ]);
-    expect(docker.getContainers).toHaveBeenCalledTimes(1);
+    expect(docker.getAllContainers).toHaveBeenCalledTimes(1);
     expect(docker.backupContainer).toHaveBeenCalledTimes(3);
     expect(docker.backupContainer).toHaveBeenLastCalledWith(8);
   });
@@ -33,7 +33,7 @@ describe('backup', () => {
 
     await main();
 
-    expect(docker.getContainers).toHaveBeenCalledTimes(0);
+    expect(docker.getAllContainers).toHaveBeenCalledTimes(0);
     expect(docker.backupContainer).toHaveBeenCalledTimes(1);
     expect(docker.backupContainer).toHaveBeenLastCalledWith('pear');
   });
@@ -68,7 +68,7 @@ describe('restore', () => {
       { name: 'b', result: true },
       { name: 'c', result: true },
     ]);
-    expect(fs.readdirSync).toHaveBeenCalledTimes(1);
+    expect(fs.readdirSync).toHaveBeenCalledTimes(3);
     expect(fs.readdirSync).toHaveBeenCalledWith('/folder/containers');
     expect(docker.restoreContainer).toHaveBeenCalledTimes(3);
     expect(docker.restoreContainer).toHaveBeenLastCalledWith('c');

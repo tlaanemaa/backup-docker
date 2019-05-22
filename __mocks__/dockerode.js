@@ -49,8 +49,17 @@ Docker.mockImage = {
   },
 };
 
+Docker.mockVolume = {
+  inspect: () => ({
+    Name: 'banana',
+    Labels: [],
+  }),
+};
+
 Docker.prototype.getContainer = () => Docker.mockContainer;
 Docker.prototype.getImage = () => Docker.mockImage;
+Docker.prototype.getVolume = () => Docker.mockVolume;
+Docker.prototype.createVolume = jest.fn().mockResolvedValue(Docker.mockVolume);
 Docker.prototype.run = jest.fn().mockResolvedValue();
 Docker.prototype.createContainer = jest.fn().mockResolvedValue(Docker.mockContainer);
 Docker.prototype.pull = jest.fn().mockImplementation((name, callback) => {

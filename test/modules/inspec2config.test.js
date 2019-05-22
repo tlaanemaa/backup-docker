@@ -1,8 +1,8 @@
-const inspect2config = require('../../src/modules/inspect2config');
+const { containerInspect2Config, volumeInspect2Config } = require('../../src/modules/inspect2config');
 
-describe('inspect2config', () => {
+describe('containerInspect2Config', () => {
   it('should parse the inspection result into a config', () => {
-    const config = inspect2config({
+    const config = containerInspect2Config({
       Name: '/orange',
       State: {
         Running: true,
@@ -54,7 +54,7 @@ describe('inspect2config', () => {
   });
 
   it('should hostname and exposed ports when NetworkMode is container:', () => {
-    const config = inspect2config({
+    const config = containerInspect2Config({
       Name: '/orange',
       State: {
         Running: true,
@@ -89,7 +89,7 @@ describe('inspect2config', () => {
   });
 
   it('should add :ro to read-only mounts', () => {
-    const config = inspect2config({
+    const config = containerInspect2Config({
       Name: '/orange',
       State: {
         Running: true,
@@ -124,7 +124,7 @@ describe('inspect2config', () => {
   });
 
   it('should use Source if Name is not provided', () => {
-    const config = inspect2config({
+    const config = containerInspect2Config({
       Name: '/orange',
       State: {
         Running: true,
@@ -158,7 +158,7 @@ describe('inspect2config', () => {
   });
 
   it('should ignore mounts without name or source and destination', () => {
-    const config = inspect2config({
+    const config = containerInspect2Config({
       Name: '/orange',
       State: {
         Running: true,
@@ -187,5 +187,32 @@ describe('inspect2config', () => {
     });
 
     expect(config.HostConfig.Binds).toEqual([]);
+  });
+});
+
+describe('volumeInspect2Config', () => {
+  const config = volumeInspect2Config({
+    CreatedAt: '2019-05-18T09:59:26Z',
+    Driver: 'local',
+    Labels: null,
+    Mountpoint: '/var/lib/docker/volumes/nfs-mount/_data',
+    Name: 'nfs-mount',
+    Options: {
+      device: ':/volume1/main',
+      o: 'addr=127.0.0.1,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14',
+      type: 'nfs4',
+    },
+    Scope: 'local',
+  });
+
+  expect(config).toEqual({
+    Name: 'nfs-mount',
+    Driver: 'local',
+    DriverOpts: {
+      device: ':/volume1/main',
+      o: 'addr=127.0.0.1,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14',
+      type: 'nfs4',
+    },
+    Labels: null,
   });
 });

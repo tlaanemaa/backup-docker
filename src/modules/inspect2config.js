@@ -3,7 +3,7 @@
   https://github.com/portainer/portainer/blob/develop/app/docker/helpers/containerHelper.js#L18
 */
 
-module.exports = (container) => {
+const containerInspect2Config = (container) => {
   const config = container.Config;
 
   // HostConfig
@@ -42,4 +42,17 @@ module.exports = (container) => {
   config.HostConfig.Binds = binds;
   config.Volumes = volumes;
   return config;
+};
+
+// Convert volume inspect to a config used for volume creation
+const volumeInspect2Config = inspect => ({
+  Name: inspect.Name,
+  Driver: inspect.Driver,
+  DriverOpts: inspect.Options,
+  Labels: inspect.Labels,
+});
+
+module.exports = {
+  containerInspect2Config,
+  volumeInspect2Config,
 };

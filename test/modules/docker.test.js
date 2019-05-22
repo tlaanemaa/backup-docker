@@ -5,11 +5,11 @@ jest.mock('../../src/modules/options.js');
 
 beforeEach(() => jest.resetModules());
 
-describe('getContainers', () => {
+describe('getAllContainers', () => {
   it('should return an array of container ids', async () => {
     const docker = require('../../src/modules/docker');
 
-    const containers = await docker.getContainers();
+    const containers = await docker.getAllContainers();
 
     expect(containers).toEqual([1, 2, 3]);
   });
@@ -23,7 +23,7 @@ describe('backupContainer', () => {
 
     await docker.backupContainer(3);
 
-    expect(fs.writeFile).toHaveBeenCalledTimes(1);
+    expect(fs.writeFile).toHaveBeenCalledTimes(3);
     expect(fs.writeFile).toHaveBeenCalledWith(
       '/folder/containers/banana.json',
       JSON.stringify(dockerode.mockInspection, null, 2),
@@ -34,33 +34,36 @@ describe('backupContainer', () => {
   it('should tar volumes, stop container and start it again', async () => {
     const dockerode = require('dockerode');
     dockerode.mockContainer.stop = jest.fn();
-    dockerode.mockContainer.start = jest.fn();
+    dockerode.mockInspection.Id = 3;
+    dockerode.mockInspection.Mounts = [{ Name: 'mount1', Destination: 'dest1', Type: 'volume' }];
+    dockerode.prototype.listContainers = () => Promise.resolve([{ Id: 3 }]);
     const docker = require('../../src/modules/docker');
 
     await docker.backupContainer(3);
 
     expect(dockerode.mockContainer.stop).toHaveBeenCalledTimes(1);
-    expect(dockerode.mockContainer.start).toHaveBeenCalledTimes(1);
-    expect(dockerode.prototype.run).toHaveBeenCalledTimes(2);
+    expect(dockerode.prototype.run).toHaveBeenCalledTimes(1);
     expect(dockerode.prototype.run).toHaveBeenLastCalledWith(
-      'ubuntu',
-      ['tar', 'cvf', '/__volume_backup_mount__/mount2.tar', 'dest2'],
+      'ubuntu:latest',
+      ['tar', 'cvf', '/__volume_backup_mount__/mount1.tar', '/__volume__'],
       expect.any(Object),
       {
         HostConfig: {
           AutoRemove: true,
-          Binds: ['/folder/volumes:/__volume_backup_mount__'],
-          VolumesFrom: ['banana'],
+          Binds: [
+            '/folder/volumes:/__volume_backup_mount__',
+            'mount1:/__volume__',
+          ],
         },
       },
     );
   });
 
-  it('should only write inspect when only is containers', async () => {
+  it('should only write container inspect when only is containers', async () => {
     const fs = require('fs');
     const dockerode = require('dockerode');
     const options = require('../../src/modules/options');
-    options.onlyContainers = true;
+    options.operateOnVolumes = false;
     const docker = require('../../src/modules/docker');
 
     await docker.backupContainer(3);
@@ -69,17 +72,17 @@ describe('backupContainer', () => {
     expect(fs.writeFile).toHaveBeenCalledTimes(1);
   });
 
-  it('should only write volumes when only is volumes', async () => {
+  it('should only write volumes and their inspects when only is volumes', async () => {
     const fs = require('fs');
     const dockerode = require('dockerode');
     const options = require('../../src/modules/options');
-    options.onlyVolumes = true;
+    options.operateOnContainers = false;
     const docker = require('../../src/modules/docker');
 
     await docker.backupContainer(3);
 
     expect(dockerode.prototype.run).toHaveBeenCalledTimes(2);
-    expect(fs.writeFile).toHaveBeenCalledTimes(0);
+    expect(fs.writeFile).toHaveBeenCalledTimes(2);
   });
 
   it('should not stop container when there are no volumes', async () => {
@@ -87,7 +90,7 @@ describe('backupContainer', () => {
     dockerode.mockInspection.Mounts = [];
     dockerode.mockContainer.stop = jest.fn();
     const options = require('../../src/modules/options');
-    options.onlyVolumes = true;
+    options.operateOnContainers = false;
     const docker = require('../../src/modules/docker');
 
     await docker.backupContainer(3);
@@ -124,29 +127,43 @@ describe('restoreContainer', () => {
 
   it('should untar volumes, stop container and start it again', async () => {
     const fs = require('fs');
-    fs.readdirSync = jest.fn().mockImplementation(() => ['mount1.tar', 'mount2.tar']);
+    fs.readdirSync = jest.fn().mockImplementation(() => ['mount1.tar', 'mount1.json']);
     const dockerode = require('dockerode');
+    dockerode.prototype.listContainers = () => Promise.resolve([{ Id: 3 }]);
     dockerode.mockContainer.stop = jest.fn();
-    dockerode.mockContainer.start = jest.fn();
     const docker = require('../../src/modules/docker');
 
     await docker.restoreContainer('orange');
 
     expect(dockerode.mockContainer.stop).toHaveBeenCalledTimes(1);
-    expect(dockerode.mockContainer.start).toHaveBeenCalledTimes(1);
-    expect(dockerode.prototype.run).toHaveBeenCalledTimes(2);
+    expect(dockerode.prototype.run).toHaveBeenCalledTimes(1);
     expect(dockerode.prototype.run).toHaveBeenLastCalledWith(
-      'ubuntu',
-      ['tar', 'xvf', '/__volume_backup_mount__/mount2.tar', '--strip', '1', '--directory', 'dest2'],
+      'ubuntu:latest',
+      ['tar', 'xvf', '/__volume_backup_mount__/mount1.tar', '--strip', '1', '--directory', '/__volume__'],
       expect.any(Object),
       {
         HostConfig: {
           AutoRemove: true,
-          Binds: ['/folder/volumes:/__volume_backup_mount__'],
-          VolumesFrom: ['orange'],
+          Binds: [
+            '/folder/volumes:/__volume_backup_mount__',
+            'mount1:/__volume__',
+          ],
         },
       },
     );
+  });
+
+  it('should create the volume if it doesn\'t exist', async () => {
+    const fs = require('fs');
+    fs.readdirSync = jest.fn().mockImplementation(() => ['mount1.tar', 'mount1.json']);
+    const dockerode = require('dockerode');
+    dockerode.prototype.getVolume = () => null;
+    const docker = require('../../src/modules/docker');
+
+    await docker.restoreContainer('orange');
+
+    expect(dockerode.prototype.createVolume).toHaveBeenCalledTimes(1);
+    expect(dockerode.prototype.createVolume).toHaveBeenCalledWith(expect.any(Object));
   });
 
   it('should start the container if it was backed up in a running state', async () => {
@@ -165,7 +182,7 @@ describe('restoreContainer', () => {
   it('should only restore containers when only is containers', async () => {
     const dockerode = require('dockerode');
     const options = require('../../src/modules/options');
-    options.onlyContainers = true;
+    options.operateOnVolumes = false;
     const docker = require('../../src/modules/docker');
 
     await docker.restoreContainer('orange');
@@ -176,10 +193,10 @@ describe('restoreContainer', () => {
 
   it('should only restore volumes when only is volumes', async () => {
     const fs = require('fs');
-    fs.readdirSync = jest.fn().mockImplementation(() => ['mount1.tar', 'mount2.tar']);
+    fs.readdirSync = jest.fn().mockImplementation(() => ['mount1.tar', 'mount2.tar', 'mount1.json', 'mount2.json']);
     const dockerode = require('dockerode');
     const options = require('../../src/modules/options');
-    options.onlyVolumes = true;
+    options.operateOnContainers = false;
     const docker = require('../../src/modules/docker');
 
     await docker.restoreContainer('orange');
@@ -194,7 +211,7 @@ describe('restoreContainer', () => {
     const dockerode = require('dockerode');
     dockerode.mockContainer.stop = jest.fn();
     const options = require('../../src/modules/options');
-    options.onlyVolumes = true;
+    options.operateOnContainers = true;
     const docker = require('../../src/modules/docker');
 
     await docker.restoreContainer('orange');
@@ -266,5 +283,54 @@ describe('ensureImageExists', () => {
 
     expect(result).toEqual(undefined);
     expect(docker.pullImage).toHaveBeenCalledTimes(0);
+  });
+});
+
+describe('wrapDockerErr', () => {
+  it('should hide < 400 errors since those are actually fine', async () => {
+    expect.assertions(1);
+    const { wrapDockerErr } = require('../../src/modules/docker');
+    const errorFunc = () => {
+      const err = new Error('blah');
+      err.statusCode = 304;
+      throw err;
+    };
+
+    try {
+      const result = await wrapDockerErr(errorFunc)();
+      expect(result).toBe(undefined);
+    } catch (e) {
+      // Do nothing
+    }
+  });
+
+  it('should throw >= 400 errors', async () => {
+    expect.assertions(1);
+    const { wrapDockerErr } = require('../../src/modules/docker');
+    const errorFunc = () => {
+      const err = new Error('blah');
+      err.statusCode = 404;
+      throw err;
+    };
+
+    try {
+      await wrapDockerErr(errorFunc)();
+    } catch (e) {
+      expect(e).toBeInstanceOf(Error);
+    }
+  });
+
+  it('should throw errors without a statusCode', async () => {
+    expect.assertions(1);
+    const { wrapDockerErr } = require('../../src/modules/docker');
+    const errorFunc = () => {
+      throw new Error('blah');
+    };
+
+    try {
+      await wrapDockerErr(errorFunc)();
+    } catch (e) {
+      expect(e).toBeInstanceOf(Error);
+    }
   });
 });

@@ -17,7 +17,10 @@ program
 program
   .command('backup [containers...]')
   .description('backup given or all containers in docker instance')
-  .action(async (containers) => {
+  .option('--nfs-volume-contents', 'also backup the contents of nfs volumes')
+  .option('--non-persistent-volumes', 'also backup non-persistent (unnamed) volumes')
+  .action(async (containers, opts) => {
+    Object.assign(commandArgs, opts.opts());
     commandArgs.operation = 'backup';
     commandArgs.containers = containers;
   });
@@ -46,4 +49,11 @@ if (!commandArgs.operation) {
   program.help();
 }
 
-module.exports = { ...commandArgs, ...program.opts() };
+const options = { ...commandArgs, ...program.opts() };
+
+// Convert volume and container switches to more easily usable values
+module.exports = {
+  ...options,
+  operateOnContainers: options.onlyContainers || (!options.onlyContainers && !options.onlyVolumes),
+  operateOnVolumes: options.onlyVolumes || (!options.onlyVolumes && !options.onlyContainers),
+};
