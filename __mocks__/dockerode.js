@@ -15,8 +15,8 @@ class Docker extends Dockerode {
 
 Docker.prototype.listContainers = () => Promise.resolve([
   { Id: 1, Names: ['/banana'] },
-  { Id: 2, Names: ['/mango'] },
-  { Id: 3, Names: ['/orange'] },
+  { Id: 2, Names: [] },
+  { Id: 3 },
 ]);
 
 Docker.mockOnFinishedArgs = [null, 'orange'];
