@@ -20,6 +20,8 @@ When run, two directories are created if not already present in the target direc
 
 _When run with `restore` command, backup-docker will expect these folders to exist in the target directory, if they don't, it will create them_
 
+By default, backup-docker will not backup non-persistent volumes (auto-created) and contents of NFS volumes. This is because it is assumed, that non-persistent volumes don't contain anything worth backing up and NFS volumes are already backed up by whoever is hosting them. This can be altered with the `--non-persistent-volumes` and `--nfs-volume-contents` flags.
+
 ## Examples
 - `backup-docker backup` - Will backup all containers in the docker instance, and their volumes
 - `backup-docker restore` - Will restore all containers in containers folder, and their volumes
