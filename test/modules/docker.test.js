@@ -98,6 +98,19 @@ describe('backupContainer', () => {
     expect(dockerode.prototype.run).toHaveBeenCalledTimes(0);
     expect(dockerode.mockContainer.stop).toHaveBeenCalledTimes(0);
   });
+
+  it('should throw if tar returns with non-zero exit code', async () => {
+    expect.assertions(1);
+    const dockerode = require('dockerode');
+    dockerode.prototype.run = jest.fn().mockResolvedValue({ output: { StatusCode: 1 } });
+    const docker = require('../../src/modules/docker');
+
+    try {
+      await docker.backupContainer('orange');
+    } catch (e) {
+      expect(e.message).toBe('Volume backup tar command failed, see previous errors.');
+    }
+  });
 });
 
 describe('restoreContainer', () => {
@@ -245,6 +258,21 @@ describe('restoreContainer', () => {
       await docker.restoreContainer('orange');
     } catch (e) {
       expect(e).toBe(mockError);
+    }
+  });
+
+  it('should throw if tar returns with non-zero exit code', async () => {
+    expect.assertions(1);
+    const fs = require('fs');
+    fs.readdirSync = jest.fn().mockImplementation(() => ['mount1.tar', 'mount1.json']);
+    const dockerode = require('dockerode');
+    dockerode.prototype.run = jest.fn().mockResolvedValue({ output: { StatusCode: 1 } });
+    const docker = require('../../src/modules/docker');
+
+    try {
+      await docker.restoreContainer('orange');
+    } catch (e) {
+      expect(e.message).toBe('Volume restore tar command failed, see previous errors.');
     }
   });
 });
