@@ -11,7 +11,7 @@ describe('getAllContainers', () => {
 
     const containers = await docker.getAllContainers();
 
-    expect(containers).toEqual(['banana', 'mango', 'orange']);
+    expect(containers).toEqual(['banana', 2, 3]);
   });
 });
 
@@ -332,5 +332,25 @@ describe('wrapDockerErr', () => {
     } catch (e) {
       expect(e).toBeInstanceOf(Error);
     }
+  });
+});
+
+describe('getRunningContainers', () => {
+  it('should return running containers', async () => {
+    const dockerode = require('dockerode');
+    dockerode.prototype.listContainers = jest.fn().mockResolvedValue([
+      { Id: 1, Names: ['/banana'] },
+      { Id: 2, Names: [] },
+      { Id: 3 },
+    ]);
+    const docker = require('../../src/modules/docker');
+
+    const result = await docker.getRunningContainers();
+
+    expect(result).toEqual(['banana', 2, 3]);
+    expect(dockerode.prototype.listContainers).toHaveBeenCalledTimes(1);
+    expect(dockerode.prototype.listContainers).toHaveBeenCalledWith({
+      filters: { status: ['running'] },
+    });
   });
 });
