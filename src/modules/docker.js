@@ -48,7 +48,11 @@ const wrapDockerErr = func => async (...args) => {
 
 // Reduce container list to ids
 const reduceContainerList = containers => containers
-  .map(container => formatName(container.Names[0]));
+  .map(container => (
+    Array.isArray(container.Names) && typeof container.Names[0] === 'string'
+      ? formatName(container.Names[0])
+      : container.Id
+  ));
 
 // Get all containers
 const getAllContainers = async () => {
