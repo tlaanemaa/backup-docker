@@ -21,7 +21,7 @@ module.exports = async () => {
   // Print a summary of the results if there are any
   if (results.length) {
     // eslint-disable-next-line no-console
-    console.log('\nSummary (does not include errors from the tar command used for volume backup/restore):');
+    console.log('\nSummary:');
     results.forEach(({ name, result }) => {
       const success = !(result instanceof Error);
       const mark = success ? '✔' : '✖';

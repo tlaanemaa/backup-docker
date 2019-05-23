@@ -209,7 +209,7 @@ const backupVolume = volumeLimit(async (name) => {
 
   // eslint-disable-next-line no-console
   console.log(`Starting volume backup for ${name}...`);
-  await docker.run(
+  const runResult = await docker.run(
     volumeOperationsImage,
     ['tar', 'cvf', `${dockerBackupMountDir}/${name}.tar`, dockerBackupVolumeDir],
     process.stdout,
@@ -223,6 +223,11 @@ const backupVolume = volumeLimit(async (name) => {
       },
     },
   );
+
+  // Throw the returned error
+  if (runResult.output.StatusCode !== 0) {
+    throw new Error(runResult.output.Error || 'Volume backup tar command failed, see previous errors.');
+  }
 });
 
 // Back up single container by id
@@ -281,7 +286,7 @@ const restoreVolume = volumeLimit(async (name) => {
     // eslint-disable-next-line no-console
     console.log(`Restoring contents of ${inspect.Name}...`);
 
-    await docker.run(
+    const runResult = await docker.run(
       volumeOperationsImage,
       ['tar', 'xvf', `${dockerBackupMountDir}/${name}.tar`, '--strip', '1', '--directory', dockerBackupVolumeDir],
       process.stdout,
@@ -295,6 +300,12 @@ const restoreVolume = volumeLimit(async (name) => {
         },
       },
     );
+
+
+    // Throw the returned error
+    if (runResult.output.StatusCode !== 0) {
+      throw new Error(runResult.output.Error || 'Volume restore tar command failed, see previous errors.');
+    }
   }
 });
 
