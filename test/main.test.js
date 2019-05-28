@@ -50,6 +50,28 @@ describe('backup', () => {
 
     expect(global.console.log).toHaveBeenLastCalledWith('  ✖ pear: Mock backup error');
   });
+
+  it('should not print anything if the run result is empty', async () => {
+    const docker = require('../src/modules/docker');
+    docker.getAllContainers = jest.fn().mockResolvedValue([]);
+    global.console.log = jest.fn();
+    const main = require('../src/main');
+
+    await main();
+
+    expect(global.console.log).toHaveBeenLastCalledWith('== Done ==');
+  });
+
+  it('should not pull volume image unless its needed', async () => {
+    const options = require('../src/modules/options');
+    options.operateOnVolumes = false;
+    const docker = require('../src/modules/docker');
+    const main = require('../src/main');
+
+    await main();
+
+    expect(docker.ensureVolumeImageExists).toHaveBeenCalledTimes(0);
+  });
 });
 
 describe('restore', () => {
