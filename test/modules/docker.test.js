@@ -394,3 +394,29 @@ describe('getRunningContainers', () => {
     });
   });
 });
+
+describe('isNfsVolume', () => {
+  it('should properly read the type', () => {
+    const docker = require('../../src/modules/docker');
+
+    const result = docker.isNfsVolume({
+      Options: {
+        type: 'nfsv4-mount',
+      },
+    });
+
+    expect(result).toBe(true);
+  });
+});
+
+describe('isNonPersistentVolume', () => {
+  it('should properly identify non-persistent volumes based on Labels and Options', () => {
+    const docker = require('../../src/modules/docker');
+
+    const result = docker.isNonPersistentVolume({
+      Name: 'Banana',
+    });
+
+    expect(result).toBe(true);
+  });
+});

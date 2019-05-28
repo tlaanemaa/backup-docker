@@ -361,4 +361,6 @@ module.exports = {
   ensureImageExists,
   ensureVolumeImageExists,
   wrapDockerErr,
+  isNfsVolume,
+  isNonPersistentVolume,
 };
