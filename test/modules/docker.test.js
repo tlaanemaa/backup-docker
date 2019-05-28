@@ -314,6 +314,18 @@ describe('ensureImageExists', () => {
   });
 });
 
+describe('ensureVolumeImageExists', () => {
+  it('should call ensureImageExists with volume image', async () => {
+    const dockerode = require('dockerode');
+    dockerode.prototype.getImage = jest.fn();
+    const docker = require('../../src/modules/docker');
+
+    await docker.ensureVolumeImageExists();
+
+    expect(dockerode.prototype.getImage).toHaveBeenCalledWith('ubuntu:latest');
+  });
+});
+
 describe('wrapDockerErr', () => {
   it('should hide < 400 errors since those are actually fine', async () => {
     expect.assertions(1);
