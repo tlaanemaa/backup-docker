@@ -1,6 +1,6 @@
 {
   "name": "backup-docker",
-  "version": "1.4.2",
+  "version": "1.5.0",
   "description": "A simple command line tool to backup and restore docker containers along with their volumes",
   "main": "src/main.js",
   "scripts": {
