@@ -1,1 +1,1 @@
-module.exports = () => func => func;
+module.exports = () => (func) => func;

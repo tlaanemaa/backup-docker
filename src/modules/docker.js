@@ -33,7 +33,7 @@ const containerLimit = createLimiter(1);
 const volumeLimit = createLimiter(1);
 
 // Docker error wrapper. This just ignores errors with code < 400
-const wrapDockerErr = func => async (...args) => {
+const wrapDockerErr = (func) => async (...args) => {
   try {
     // We shouldn't return here because we don't (can't) return when a 300 error occurs
     await func(...args);
@@ -47,8 +47,8 @@ const wrapDockerErr = func => async (...args) => {
 };
 
 // Reduce container list to ids
-const reduceContainerList = containers => containers
-  .map(container => (
+const reduceContainerList = (containers) => containers
+  .map((container) => (
     Array.isArray(container.Names) && typeof container.Names[0] === 'string'
       ? formatName(container.Names[0])
       : container.Id
@@ -90,7 +90,7 @@ const volumeExists = async (name) => {
 };
 
 // Helper to pull an image and log
-const pullImage = name => new Promise((resolve, reject) => {
+const pullImage = (name) => new Promise((resolve, reject) => {
   // TODO: Remove this once dockerode supports default tags
   // https://github.com/apocas/dockerode/pull/518
   const imageName = parseRepositoryTag(name).tag ? name : `${name}:latest`;
@@ -111,7 +111,7 @@ const pullImage = name => new Promise((resolve, reject) => {
           && event.progressDetail.current
           && event.progressDetail.total
         ) {
-          progress = ` (${round(event.progressDetail.current / event.progressDetail.total * 100, 2)}%)`;
+          progress = ` (${round((event.progressDetail.current / event.progressDetail.total) * 100, 2)}%)`;
         }
 
         // eslint-disable-next-line no-console
@@ -168,13 +168,13 @@ const stopContainer = wrapDockerErr(async (id) => {
 });
 
 // Helper to detect volumes
-const isVolume = mount => mount.Name && mount.Type === 'volume';
+const isVolume = (mount) => mount.Name && mount.Type === 'volume';
 
 // Helper to detect NFS volumes
-const isNfsVolume = inspect => inspect.Options && typeof inspect.Options.type === 'string' && !!inspect.Options.type.match(/nfs/i);
+const isNfsVolume = (inspect) => inspect.Options && typeof inspect.Options.type === 'string' && !!inspect.Options.type.match(/nfs/i);
 
 // Helper to detect non-persistent volumes
-const isNonPersistentVolume = inspect => inspect.Labels == null && inspect.Options == null;
+const isNonPersistentVolume = (inspect) => inspect.Labels == null && inspect.Options == null;
 
 // Backup volume as a tar file
 const volumesAlreadyBackedUp = [];
@@ -204,7 +204,7 @@ const backupVolume = volumeLimit(async (name) => {
 
   // Stop these containers so they wouldn't change their data
   await Promise.all(
-    containerIds.map(containerId => stopContainer(containerId)),
+    containerIds.map((containerId) => stopContainer(containerId)),
   );
 
   // eslint-disable-next-line no-console
@@ -225,8 +225,9 @@ const backupVolume = volumeLimit(async (name) => {
   );
 
   // Throw the returned error
-  if (runResult.output.StatusCode !== 0) {
-    throw new Error(runResult.output.Error || 'Volume backup tar command failed, see previous errors.');
+  const status = runResult[0];
+  if (status.StatusCode !== 0) {
+    throw new Error(status.Error || 'Volume backup tar command failed, see previous errors.');
   }
 });
 
@@ -240,11 +241,11 @@ const backupContainer = containerLimit(async (id) => {
   // Backup volumes
   if (operateOnVolumes) {
     // Extract and filter volumes to know if we have anything to backup
-    const volumes = inspect.Mounts.filter(mount => isVolume(mount));
+    const volumes = inspect.Mounts.filter((mount) => isVolume(mount));
 
     // Backup volumes
     await Promise.all(
-      volumes.map(volume => backupVolume(volume.Name)),
+      volumes.map((volume) => backupVolume(volume.Name)),
     );
   }
 
@@ -280,7 +281,7 @@ const restoreVolume = volumeLimit(async (name) => {
 
     // Stop these containers so they wouldn't change their data
     await Promise.all(
-      containerIds.map(containerId => stopContainer(containerId)),
+      containerIds.map((containerId) => stopContainer(containerId)),
     );
 
     // eslint-disable-next-line no-console
@@ -303,8 +304,9 @@ const restoreVolume = volumeLimit(async (name) => {
 
 
     // Throw the returned error
-    if (runResult.output.StatusCode !== 0) {
-      throw new Error(runResult.output.Error || 'Volume restore tar command failed, see previous errors.');
+    const status = runResult[0];
+    if (status.StatusCode !== 0) {
+      throw new Error(status.Error || 'Volume restore tar command failed, see previous errors.');
     }
   }
 });
@@ -320,13 +322,13 @@ const restoreContainer = containerLimit(async (name) => {
   if (operateOnVolumes) {
     // Extract and filter volumes to know if we have anything to restore
     const volumes = inspect.Mounts
-      .filter(mount => isVolume(mount) && volumeInspects.includes(mount.Name));
+      .filter((mount) => isVolume(mount) && volumeInspects.includes(mount.Name));
 
     // Only go ahead if we actually have backup files to restore
     if (volumes.length) {
       // Go over the container's volumes and restore their contents
       await Promise.all(
-        volumes.map(volume => restoreVolume(volume.Name)),
+        volumes.map((volume) => restoreVolume(volume.Name)),
       );
     }
   }

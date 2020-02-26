@@ -60,7 +60,7 @@ Docker.prototype.getContainer = () => Docker.mockContainer;
 Docker.prototype.getImage = () => Docker.mockImage;
 Docker.prototype.getVolume = () => Docker.mockVolume;
 Docker.prototype.createVolume = jest.fn().mockResolvedValue(Docker.mockVolume);
-Docker.prototype.run = jest.fn().mockResolvedValue({ output: { StatusCode: 0 } });
+Docker.prototype.run = jest.fn().mockResolvedValue([{ StatusCode: 0 }]);
 Docker.prototype.createContainer = jest.fn().mockResolvedValue(Docker.mockContainer);
 Docker.prototype.pull = jest.fn().mockImplementation((name, callback) => {
   callback(null, 'stream');

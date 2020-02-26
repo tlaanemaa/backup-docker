@@ -8,17 +8,17 @@ const writeFile = promisify(fs.writeFile);
 const readFile = promisify(fs.readFile);
 
 // Format container names
-const formatName = name => name.replace(/^\//g, '');
+const formatName = (name) => name.replace(/^\//g, '');
 
 // Get contents of a folder synchronously
 const getFilesSync = (folder, extension) => {
   const files = fs.readdirSync(folder);
-  return files.filter(file => path.extname(file) === extension);
+  return files.filter((file) => path.extname(file) === extension);
 };
 
 // Get all inspect backups synchronously
-const getInspectFilesSync = dir => getFilesSync(dir, '.json')
-  .map(file => path.basename(file, path.extname(file)));
+const getInspectFilesSync = (dir) => getFilesSync(dir, '.json')
+  .map((file) => path.basename(file, path.extname(file)));
 
 // Specific helpers for containers and volumes
 const getContainerInspectFilesSync = () => getInspectFilesSync(folders.containers);
@@ -32,8 +32,8 @@ const loadInspect = async (name, dir) => {
 };
 
 // Specific helpers for containers and volumes
-const loadContainerInspect = inspect => loadInspect(inspect, folders.containers);
-const loadVolumeInspect = inspect => loadInspect(inspect, folders.volumes);
+const loadContainerInspect = (inspect) => loadInspect(inspect, folders.containers);
+const loadVolumeInspect = (inspect) => loadInspect(inspect, folders.volumes);
 
 // Write inspects
 const saveInspect = (inspect, dir) => {
@@ -44,15 +44,15 @@ const saveInspect = (inspect, dir) => {
 };
 
 // Specific helpers for containers and volumes
-const saveContainerInspect = inspect => saveInspect(inspect, folders.containers);
-const saveVolumeInspect = inspect => saveInspect(inspect, folders.volumes);
+const saveContainerInspect = (inspect) => saveInspect(inspect, folders.containers);
+const saveVolumeInspect = (inspect) => saveInspect(inspect, folders.volumes);
 
 // Get all volume backups synchronously
 const getVolumeArchivesSync = () => getFilesSync(folders.volumes, '.tar')
-  .map(file => path.basename(file, path.extname(file)));
+  .map((file) => path.basename(file, path.extname(file)));
 
 // Helper to catch errors, log and then return them
-const logAndReturnErrors = func => async (...args) => {
+const logAndReturnErrors = (func) => async (...args) => {
   try {
     return await func(...args);
   } catch (e) {

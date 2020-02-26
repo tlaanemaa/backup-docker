@@ -37,8 +37,8 @@ program
 // Unknown command handler
 program
   .command('*', { noHelp: true })
-  .action((command) => {
-    throw new Error(`Unknown command: ${command}\nUse --help to see usage information`);
+  .action((dir, command) => {
+    throw new Error(`Unknown command: ${command[0]}\nUse --help to see usage information`);
   });
 
 // Parse args

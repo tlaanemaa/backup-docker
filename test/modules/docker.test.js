@@ -102,7 +102,7 @@ describe('backupContainer', () => {
   it('should throw if tar returns with non-zero exit code', async () => {
     expect.assertions(1);
     const dockerode = require('dockerode');
-    dockerode.prototype.run = jest.fn().mockResolvedValue({ output: { StatusCode: 1 } });
+    dockerode.prototype.run = jest.fn().mockResolvedValue([{ StatusCode: 1 }]);
     const docker = require('../../src/modules/docker');
 
     try {
@@ -266,7 +266,7 @@ describe('restoreContainer', () => {
     const fs = require('fs');
     fs.readdirSync = jest.fn().mockImplementation(() => ['mount1.tar', 'mount1.json']);
     const dockerode = require('dockerode');
-    dockerode.prototype.run = jest.fn().mockResolvedValue({ output: { StatusCode: 1 } });
+    dockerode.prototype.run = jest.fn().mockResolvedValue([{ StatusCode: 1 }]);
     const docker = require('../../src/modules/docker');
 
     try {
