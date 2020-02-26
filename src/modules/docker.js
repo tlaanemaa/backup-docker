@@ -1,5 +1,4 @@
 const Docker = require('dockerode');
-const { parseRepositoryTag } = require('dockerode/lib/util');
 const createLimiter = require('limit-async');
 const { volumeArchives, volumeInspects } = require('./fileStructure');
 const { containerInspect2Config, volumeInspect2Config } = require('./inspect2config');
@@ -91,13 +90,10 @@ const volumeExists = async (name) => {
 
 // Helper to pull an image and log
 const pullImage = (name) => new Promise((resolve, reject) => {
-  // TODO: Remove this once dockerode supports default tags
-  // https://github.com/apocas/dockerode/pull/518
-  const imageName = parseRepositoryTag(name).tag ? name : `${name}:latest`;
   // eslint-disable-next-line no-console
-  console.log(`Pulling image: ${imageName}`);
+  console.log(`Pulling image: ${name}`);
   docker.pull(
-    imageName,
+    name,
     (err, stream) => {
       if (err) {
         reject(err);
