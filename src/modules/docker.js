@@ -298,7 +298,6 @@ const restoreVolume = volumeLimit(async (name) => {
       },
     );
 
-
     // Throw the returned error
     const status = runResult[0];
     if (status.StatusCode !== 0) {
