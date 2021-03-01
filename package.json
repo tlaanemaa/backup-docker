@@ -31,12 +31,12 @@
   },
   "homepage": "https://github.com/tlaanemaa/backup-docker#readme",
   "devDependencies": {
-    "coveralls": "^3.0.9",
-    "eslint": "^6.8.0",
+    "coveralls": "^3.1.0",
+    "eslint": "^7.21.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jest": "^23.20.0",
-    "jest": "^25.1.0"
+    "eslint-plugin-jest": "^24.1.5",
+    "jest": "^26.6.3"
   },
   "dependencies": {
     "commander": "^4.1.1",
