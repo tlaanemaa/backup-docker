@@ -1,0 +1,27 @@
+name: check-code
+on: [push]
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+      - run: npm install
+  lint:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - run: npm run lint
+  type-check:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - run: npm run type-check
+  test:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - run: npm run test
+      - run: npm run coveralls
