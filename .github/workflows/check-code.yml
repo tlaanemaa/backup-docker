@@ -9,6 +9,7 @@ jobs:
         with:
           node-version: "14"
       - run: npm ci
+      - run: npm run lint
       - run: npm run test
       - name: Publish to coveralls.io
         uses: coverallsapp/github-action@v1.1.2

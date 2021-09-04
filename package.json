@@ -5,7 +5,7 @@
   "main": "src/main.js",
   "scripts": {
     "start": "node bin/run.js",
-    "test": "npm run lint && jest --coverage --silent",
+    "test": "jest --coverage --silent",
     "lint": "eslint ."
   },
   "bin": "./bin/run.js",
