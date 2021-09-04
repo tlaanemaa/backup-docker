@@ -5,9 +5,8 @@
   "main": "src/main.js",
   "scripts": {
     "start": "node bin/run.js",
-    "test": "npm run lint && jest --coverage --silent",
-    "lint": "eslint .",
-    "coveralls": "cat ./coverage/lcov.info | coveralls"
+    "test": "jest --coverage --silent",
+    "lint": "eslint ."
   },
   "bin": "./bin/run.js",
   "engines": {
