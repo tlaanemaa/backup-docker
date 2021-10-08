@@ -1,6 +1,6 @@
 const { containers: containerNames } = require('./modules/options');
 const { logAndReturnErrors } = require('./modules/utils');
-const { containerInspects } = require('./modules/fileStructure.js');
+const { containerInspects } = require('./modules/fileStructure');
 const { getAllContainers, restoreContainer, backupContainer } = require('./modules/docker');
 
 // Main backup function
